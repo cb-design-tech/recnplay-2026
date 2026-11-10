@@ -322,6 +322,25 @@ body {
 .venue-spaces { font-size: 11px; line-height: 1.5; color: var(--text-300); }
 .screen-title { scroll-margin-top: 84px; }
 
+/* Cards do Panorama que levam a uma aba: botão "Ver detalhes" + card inteiro clicável */
+.kpi-card--link { transition: background 0.15s; }
+.kpi-card--link:hover { background: var(--bg-elevated); }
+.kpi-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.kpi-more {
+  display: inline-flex; align-items: center; gap: 2px; padding: 6px 6px 6px 12px; margin-top: -2px;
+  font-family: var(--font); font-size: 12px; font-weight: 600; line-height: 1; color: var(--acc-purple);
+  background: transparent; border: 1.5px solid var(--acc-purple); border-radius: var(--r-pill);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.15s, color 0.15s;
+}
+.kpi-more .ms { font-size: 18px; transition: transform 0.15s; }
+/* o botão (sem posicionamento próprio) estica o clique para o card inteiro */
+.kpi-more::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+.kpi-card--link:hover .kpi-more { background: var(--acc-purple); color: #131313; }
+.kpi-card--link:hover .kpi-more .ms { transform: translateX(2px); }
+.kpi-more:focus-visible { outline: none; background: var(--acc-purple); color: #131313; }
+.kpi-more:focus-visible::after { outline: 2px solid var(--acc-purple); outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) { .kpi-card--link, .kpi-more, .kpi-more .ms { transition: none; } }
+
 /* ── Filtro por cliente (dropdown) ── */
 .client-filter { margin-bottom: 16px; }
 .client-filter-lbl {
@@ -853,12 +872,12 @@ body {
   <div class="nav-sticky">
     <div class="nav-gradient"></div>
     <nav class="tab-bar" id="tab-bar">
-      <button class="tab active" data-screen="submissoes">Nossas Atividades</button>
+      <button class="tab active" data-screen="panorama">Panorama</button>
+      <button class="tab" data-screen="submissoes">Nossas Atividades</button>
       <button class="tab" data-screen="convida">Clientes que convidamos</button>
       <button class="tab" data-screen="clientes">Clientes pelo Fest</button>
       <button class="tab" data-screen="convidada">Fomos Convidados</button>
       <button class="tab" data-screen="innov">Innovation Center</button>
-      <button class="tab" data-screen="panorama">Panorama</button>
     </nav>
   </div>
 
@@ -888,7 +907,7 @@ body {
   </section>
 
   <!-- PLACEHOLDERS -->
-  <section class="screen active" id="screen-submissoes">
+  <section class="screen" id="screen-submissoes">
     <h1 class="screen-title">Nossa programação<br>para o festival</h1>
     <div class="day-filter" id="day-filter-s">
       <div class="day-chip active" data-day="all"><span class="wd">11–13</span><span class="dn">Todos</span></div>
@@ -930,7 +949,7 @@ body {
     <p class="count-label" id="count-label-fomos"></p>
     <div class="cards-list" id="cards-container-fomos"></div>
   </section>
-  <section class="screen" id="screen-panorama">
+  <section class="screen active" id="screen-panorama">
     <h1 class="screen-title">Nossa presença<br>no Rec N Play</h1>
     <div class="kpi-grid">
       <div class="kpi-card">
@@ -943,14 +962,20 @@ body {
         <span class="kpi-label">Vozes Accenture</span>
         <span class="kpi-desc">profissionais únicos em palco, nas nossas atividades e nas de outros</span>
       </div>
-      <div class="kpi-card kpi-card--full kpi-card--client">
-        <span class="kpi-num" id="kpi-clientes-palco">–</span>
+      <div class="kpi-card kpi-card--full kpi-card--client kpi-card--link">
+        <div class="kpi-head">
+          <span class="kpi-num" id="kpi-clientes-palco">–</span>
+          <button type="button" class="kpi-more" data-ir="convida" aria-label="Ver detalhes: abrir a aba Clientes que convidamos">Ver detalhes<span class="ms" aria-hidden="true">chevron_right</span></button>
+        </div>
         <span class="kpi-label">Clientes no nosso palco</span>
         <span class="kpi-desc">clientes Accenture que convidamos para as nossas atividades</span>
         <div class="kpi-clients" id="kpi-chips-palco"></div>
       </div>
-      <div class="kpi-card kpi-card--wide kpi-card--client">
-        <span class="kpi-num" id="kpi-clientes-fest">–</span>
+      <div class="kpi-card kpi-card--wide kpi-card--client kpi-card--link">
+        <div class="kpi-head">
+          <span class="kpi-num" id="kpi-clientes-fest">–</span>
+          <button type="button" class="kpi-more" data-ir="clientes" aria-label="Ver detalhes: abrir a aba Clientes pelo Fest">Ver detalhes<span class="ms" aria-hidden="true">chevron_right</span></button>
+        </div>
         <span class="kpi-label">Clientes no festival</span>
         <span class="kpi-desc">clientes Accenture presentes em toda a programação: nossas atividades e as demais</span>
         <div class="kpi-clients" id="kpi-chips-fest"></div>
@@ -967,7 +992,7 @@ body {
       </div>
       <div class="kpi-card kpi-card--viz" id="viz-locais">
         <span class="kpi-label">Onde estamos</span>
-        <span class="kpi-desc">Locais onde temos as atividades</span>
+        <span class="kpi-desc">Locais onde nossas atividades acontecem</span>
         <div class="venue-list" id="venue-list"></div>
       </div>
     </div>
@@ -1697,7 +1722,7 @@ const activities = [
   },
   { id:"cf-ae73d9ee", day:12, time:"16:40-17:40", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:["Baterias Moura"],
     offeredBy:"TDS Company", format:"Debate",
-    title:"The Frontier Moment",
+    title:"The Frontier Moment: como a IA está redefinindo o trabalho e os negócios",
     location:"E.T.E. Porto Digital - Auditório",
     speakers:[
       {name:"Silvio Meira",role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School",company:""},
@@ -2218,7 +2243,7 @@ const submissoesActivities = [
     location:"Livraria Jaqueira - Auditório",
     speakers:[
       {name:"Noemi Rodrigues",role:"Technology Associate Director",company:"Accenture"},
-      {name:"Edilson Reis",   role:"CIO | Digital, Dados, IA, Inovação e Customer Experience",company:"Bradesco Seguros",isClient:true}
+      {name:"Lucas Santana",  role:"Head",company:"Bradesco",isClient:true}
     ]
   },
   { id:"sub-23", day:12, time:"14:00-14:50", isSinergia:true,
@@ -2252,9 +2277,9 @@ const submissoesActivities = [
     title:"O Futuro do SAP Já Começou: Inteligência Artificial na Prática",
     location:"Cesar School - Bloco B - Sala 001 e 002",
     speakers:[
-      {name:"Daniel Gonzalez",            role:"Diretor de Inovação",        company:"Accenture"},
-      {name:"Fernando Costa",             role:"Gerente Sênior",             company:"Accenture do Brasil"},
-      {name:"João Otto Gethmann",         role:"Business Architecture Associate Director",company:"Accenture"}
+      {name:"João Otto Gethmann",         role:"Business Architecture Associate Director",company:"Accenture"},
+      {name:"Luciano Martins Rodrigues",  role:"Gerente | Arquiteto de Solução SAP",company:"Accenture"},
+      {name:"Gabriela Carvalho Iumatti Xavier",role:"Analista Funcional SAP SD",company:""}
     ]
   },
   { id:"sub-11", day:12, time:"17:00-18:40", isSinergia:false,
@@ -2302,8 +2327,7 @@ const submissoesActivities = [
     location:"Accenture Innovation Center - Auditório",
     speakers:[
       {name:"Noemi Rodrigues Modernel",role:"Technology Associate Director",          company:"Accenture"},
-      {name:"Mauricio Barbosa",         role:"Lead Managing Director",company:"Accenture"},
-      {name:"Daniel de Amaral",         role:"Managing Director",                      company:"Accenture"}
+      {name:"Joselyto Riani",           role:"",company:""}
     ]
   },
   { id:"sub-28", day:13, time:"Bloco 14h-18h", isSinergia:true,
@@ -2461,7 +2485,7 @@ const convidaActivities = [
     location:"Livraria Jaqueira - Auditório",
     speakers:[
       {name:"Noemi Rodrigues Modernel",role:"Technology Associate Director",                          company:"Accenture"},
-      {name:"Edilson Reis",   role:"CIO | Digital, Dados, IA, Inovação e Customer Experience",company:"Bradesco Seguros",isClient:true}
+      {name:"Lucas Santana",  role:"Head",company:"Bradesco",isClient:true}
     ]
   }
 ];
@@ -2646,8 +2670,7 @@ const icActivities = [
     format:"Debate",
     speakers:[
       {name:"Noemi Rodrigues Modernel", role:"Technology Associate Director",                        company:"Accenture"},
-      {name:"Mauricio Barbosa",          role:"Lead Managing Director",company:"Accenture"},
-      {name:"Daniel de Amaral",          role:"Managing Director",                                     company:"Accenture"}
+      {name:"Joselyto Riani",            role:"",company:""}
     ]
   },
   { id:"ic-11", day:13, time:"16:40-17:40", shortOffBy:"MV",
@@ -2741,7 +2764,7 @@ setDayC("all");
 setDayI("all");
 
 /* ───────────────────────────────────────────────
-   FOMOS CONVIDADOS — Accenture convidada por outros (5 atividades: 11/11 ×4 · 12/11 ×1)
+   FOMOS CONVIDADOS — Accenture convidada por outros (6 atividades: 11/11 ×4 · 12/11 ×2)
    Fonte: RecNPlay_2026_Convidada_Accenture.txt | revisão 2 — 10/11/2026
    ─────────────────────────────────────────────── */
 const convidadaActivities = [
@@ -2785,6 +2808,16 @@ const convidadaActivities = [
       {name:"Virgínia Heimann",             role:"Diretora na NTT Data Brasil",         company:"NTT Data Brasil"},
       {name:"Melissa Paula Namizaki Dezan", role:"Diretora na Accenture Brasil",        company:"Accenture Brasil"},
       {name:"Maria Clara Barroso",          role:"Diretora de Gente e Gestão no CITi",  company:"CITi"}
+    ]
+  },
+  { id:"fomos-06", day:12, time:"14:00-14:45", clientTags:["Banco do Brasil"],   // oferecida pelo Banco do Brasil (sem participante do cliente)
+    title:"Elas da TI: mulheres que lideram, negócios que se transformam",
+    location:"Ponto BB - Palco BBDW",
+    format:"Roda de Conversa",
+    speakers:[
+      {name:"Fernanda Breghirolli",              role:"",                            company:""},
+      {name:"Noemi Rodrigues",                   role:"Technology Associate Director",company:"Accenture"},
+      {name:"Angela Grochenisk de Lima Leal",    role:"",                            company:""}
     ]
   },
   { id:"fomos-03", day:12, time:"14:00-15:00",
@@ -2950,27 +2983,46 @@ function aplicarFiltroCliente(key, valor, voltarTodos){
 /* ================================================================
    PANORAMA — Ranking de clientes + Onde estamos (calculados dos dados)
    ================================================================ */
-function abrirCliente(cliente){
-  const noCF  = activities.some(a=>actClients(a).includes(cliente));
-  const key   = noCF ? "cf" : "c";
-  document.querySelector(`#tab-bar .tab[data-screen="${noCF ? "clientes" : "convida"}"]`).click();
-  aplicarFiltroCliente(key, cliente, true);
-  // leva ao título da aba, abaixo da barra fixa; sem animação se o usuário prefere menos movimento
-  const alvo = document.querySelector(`#screen-${noCF ? "clientes" : "convida"} .screen-title`);
+/* Navegação a partir do Panorama: abre a aba e leva ao título dela, abaixo da barra fixa
+   (sem animação se o usuário prefere menos movimento). */
+function rolarAoTitulo(screen){
+  const alvo  = document.querySelector(`#screen-${screen} .screen-title`);
   const barra = document.querySelector(".nav-sticky").offsetHeight;
-  const topo = alvo.getBoundingClientRect().top + window.scrollY - barra - 12;
+  const topo  = alvo.getBoundingClientRect().top + window.scrollY - barra - 12;
   window.scrollTo({ top: Math.max(0, topo), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 }
+function irParaAba(screen){
+  document.querySelector(`#tab-bar .tab[data-screen="${screen}"]`).click();
+  /* chegando por um card do Panorama, a aba abre completa (sem filtro de cliente nem de dia) */
+  const key = {clientes:"cf", convida:"c"}[screen];
+  if(key) aplicarFiltroCliente(key, "", true);
+  rolarAoTitulo(screen);
+}
+function abrirCliente(cliente){
+  const noCF   = activities.some(a=>actClients(a).includes(cliente));
+  const key    = noCF ? "cf" : "c";
+  const screen = noCF ? "clientes" : "convida";
+  document.querySelector(`#tab-bar .tab[data-screen="${screen}"]`).click();
+  aplicarFiltroCliente(key, cliente, true);
+  rolarAoTitulo(screen);
+}
+/* Cards "Clientes no nosso palco" / "Clientes no festival": o botão "Ver detalhes" cobre o card inteiro */
+document.querySelectorAll(".kpi-more[data-ir]").forEach(btn=>btn.addEventListener("click", ()=>irParaAba(btn.dataset.ir)));
 (function(){
-  /* ---- Ranking: cada atividade conta uma vez (várias aparecem em mais de uma aba) ---- */
-  const vistas = new Set(), cont = {};
+  /* ---- Ranking: cada atividade conta uma vez (várias aparecem em mais de uma aba).
+          As cópias de uma mesma atividade têm os clientes UNIDOS: uma pode trazer o cliente como
+          participante e outra como organizador (ex.: "Elas da TI" no Banco do Brasil). ---- */
+  const porAtividade = new Map();
   const chave  = a => normCo(a.title).replace(/[^a-z0-9]+/g," ").trim()+"|"+a.day;
   const somar  = (a, tipo) => {
-    const k = chave(a); if(vistas.has(k)) return; vistas.add(k);
-    actClients(a).forEach(c=>{ if(!cont[c]) cont[c] = {nosso:0, outros:0}; cont[c][tipo]++; });
+    const k = chave(a);
+    if(!porAtividade.has(k)) porAtividade.set(k, {tipo, clientes:new Set()});
+    actClients(a).forEach(c=>porAtividade.get(k).clientes.add(c));
   };
   submissoesActivities.forEach(a=>somar(a,"nosso"));
   [convidaActivities, icActivities, convidadaActivities, activities].forEach(l=>l.forEach(a=>somar(a,"outros")));
+  const cont = {};
+  porAtividade.forEach(({tipo, clientes})=>clientes.forEach(c=>{ if(!cont[c]) cont[c] = {nosso:0, outros:0}; cont[c][tipo]++; }));
   const rank = Object.keys(cont)
     .map(c=>({c, nosso:cont[c].nosso, outros:cont[c].outros, total:cont[c].nosso+cont[c].outros}))
     .sort((a,b)=>b.total-a.total || a.c.localeCompare(b.c,"pt-BR"));
@@ -3002,7 +3054,8 @@ function abrirCliente(cliente){
   const locais = {};
   submissoesActivities.forEach(a=>{
     const p = (a.location||"").split(" - ");
-    const venue = /^Accenture Innovation Center/.test(a.location||"") ? "Accenture Innovation Center" : p[0].trim();
+    /* A Arena Marco Zero é outro espaço no mesmo endereço do Innovation Center: linha própria */
+    const venue = /^Accenture Innovation Center - Arena/.test(a.location||"") ? "Accenture A12 - Arena" : p[0].trim();
     const espaco = p.slice(1).join(" - ");
     if(!locais[venue]) locais[venue] = {n:0, esp:{}};
     locais[venue].n++;
