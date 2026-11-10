@@ -72,6 +72,7 @@
   --acc-purple:     #C2A3FF;
   --rnp-pink:       #FF1980;
   --rnp-orange:     #FF8A00;
+  --rnp-gradient:   linear-gradient(135deg, #FF1980 0%, #FF8A00 100%);
   --text-100: #FFFFFF;
   --text-200: #D4D4D4;
   --text-300: #9B9B9B;
@@ -122,7 +123,8 @@ body {
   min-height: 100dvh;
   background: var(--bg-base);
   position: relative;
-  overflow-x: hidden;
+  /* clip (e não hidden): hidden cria contêiner de rolagem e quebra o position:sticky da nav */
+  overflow-x: clip;
 }
 
 /* HERO BANNER */
@@ -239,7 +241,14 @@ body {
   font-family: var(--font);
   -webkit-tap-highlight-color: transparent;
 }
+/* 6 chips (Todos + 11–14) cabem em telas estreitas */
+@media (max-width: 540px) {
+  .day-filter--6 { gap: 6px; }
+  .day-filter--6 .day-chip { padding: 10px 2px; min-width: 0; }
+  .day-filter--6 .day-chip .dn { font-size: 12px; }
+}
 .day-chip .wd {
+  white-space: nowrap;
   font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
@@ -274,7 +283,102 @@ body {
   gap: 12px;
 }
 
+/* ── Panorama: visões em cartão (ranking de clientes · locais) ── */
+.kpi-card--viz { grid-column: 1 / -1; }
+.viz-legend { display: flex; gap: 14px; margin-top: 10px; font-size: 11px; color: var(--text-300); }
+.viz-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.viz-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.viz-dot--out { background: var(--rnp-gradient); }
+.viz-dot--our { background: #A100FF; }
+.rank-list, .venue-list { display: flex; flex-direction: column; gap: 2px; margin-top: 12px; }
+.rank-row {
+  display: grid; grid-template-columns: minmax(96px, 36%) 1fr 2.4ch; gap: 10px; align-items: center;
+  width: calc(100% + 16px); margin: 0 -8px; padding: 7px 8px; min-height: 36px;
+  font: inherit; font-size: 12px; text-align: left; color: var(--text-200);
+  background: none; border: 0; border-radius: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.rank-row:hover { background: var(--bg-elevated); }
+.rank-row:focus-visible { outline: 2px solid var(--acc-purple); outline-offset: 0; }
+.rank-row--static { cursor: default; } .rank-row--static:hover { background: none; }
+.rank-name { line-height: 1.25; overflow-wrap: anywhere; }   /* o nome nunca é cortado: quebra em 2 linhas */
+.rank-bar { display: flex; height: 10px; border-radius: 6px; background: var(--bg-elevated); overflow: hidden; }
+.rank-seg--out { background: var(--rnp-gradient); }
+.rank-seg--our { background: #A100FF; }
+.rank-num { font-weight: 700; color: var(--text-100); text-align: right; }
+.rank-toggle {
+  margin-top: 8px; align-self: flex-start; padding: 8px 14px; font-family: var(--font); font-size: 12px; font-weight: 600;
+  color: var(--acc-purple); background: transparent; border: 1.5px solid var(--acc-purple); border-radius: var(--r-pill); cursor: pointer;
+}
+.rank-toggle:hover { background: rgba(194,163,255,0.12); }
+.rank-toggle:focus-visible { outline: 2px solid var(--acc-purple); outline-offset: 2px; }
+.rank-toggle[hidden] { display: none; }
+.venue-row { padding: 9px 0; border-bottom: 1px solid var(--border); }
+.venue-row:last-child { border-bottom: 0; }
+.venue-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.venue-name { font-size: 13px; font-weight: 600; color: var(--text-100); }
+.venue-num { font-size: 12px; font-weight: 700; color: var(--acc-purple); white-space: nowrap; }
+.venue-bar { height: 4px; border-radius: 3px; background: var(--bg-elevated); margin: 7px 0 6px; overflow: hidden; }
+.venue-bar > i { display: block; height: 100%; background: #A100FF; border-radius: 3px; }
+.venue-spaces { font-size: 11px; line-height: 1.5; color: var(--text-300); }
+.screen-title { scroll-margin-top: 84px; }
+
+/* ── Filtro por cliente (dropdown) ── */
+.client-filter { margin-bottom: 16px; }
+.client-filter-lbl {
+  display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--text-300); margin-bottom: 6px;
+}
+.client-filter-ctl { display: flex; gap: 8px; align-items: stretch; }
+.client-select {
+  flex: 1 1 auto; min-width: 0; height: 44px; padding: 0 40px 0 14px;
+  font-family: var(--font); font-size: 14px; font-weight: 500; color: var(--text-100);
+  background-color: var(--bg-elevated);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239B9B9B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  border: 1px solid var(--border-strong); border-radius: var(--r-sm);
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  text-overflow: ellipsis; transition: border-color 0.15s;
+}
+.client-select:hover { border-color: rgba(255,255,255,0.28); }
+.client-select:focus-visible { outline: 2px solid var(--acc-purple); outline-offset: 2px; }
+.client-select.is-filtered { border-color: var(--acc-purple); }
+.client-select option { background: var(--bg-surface); color: var(--text-100); }
+.client-clear {
+  flex: 0 0 44px; width: 44px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-200); background: var(--bg-elevated);
+  border: 1px solid var(--border-strong); border-radius: var(--r-sm); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.client-clear[hidden] { display: none; }
+.client-clear:hover { background: var(--bg-hover); color: var(--text-100); }
+.client-clear:focus-visible { outline: 2px solid var(--acc-purple); outline-offset: 2px; }
+.empty-action {
+  margin-top: 14px; padding: 10px 18px; font-family: var(--font); font-size: 13px; font-weight: 600;
+  color: var(--acc-purple); background: transparent; border: 1.5px solid var(--acc-purple);
+  border-radius: var(--r-pill); cursor: pointer;
+}
+.empty-action:hover { background: rgba(194,163,255,0.12); }
+
+/* Cabeçalho de data na visão "Todos" — ocupa a linha inteira do grid */
+.day-group-title {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-strong);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--acc-purple);
+}
+.day-group-title:first-child { margin-top: 0; }
+.day-group-count { font-size: 11px; font-weight: 500; color: var(--text-300); }
+
 .activity-card {
+  min-width: 0;
   background: var(--bg-elevated);
   border-radius: var(--r-md);
   padding: 16px;
@@ -356,6 +460,15 @@ body {
   line-height: 1.45;
 }
 .meta-row .ms { margin-top: 1px; flex-shrink: 0; }
+/* Participantes: sempre 1 linha, com reticências quando não couber */
+.meta-row .meta-spk {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-meta, .meta-row { min-width: 0; }
 
 .card-tags {
   display: flex;
@@ -376,6 +489,14 @@ body {
 .tag-convida    { background: transparent; border: 1.5px solid #00BAFF; color: #00BAFF; }
 .tag-ic         { background: transparent; border: 1.5px solid #F59E0B; color: #F59E0B; }
 .tag-fomos      { background: transparent; border: 1.5px solid #FF7EB3; color: #FF7EB3; }
+/* Tag de cliente Accenture: único badge com preenchimento sólido (gradiente de marca).
+   Texto escuro #131313 = contraste >= 5:1 sobre pink e laranja (branco falharia AA no laranja). */
+.tag-client-name {
+  background: var(--rnp-gradient);
+  border: 1.5px solid transparent;
+  color: #131313;
+  font-weight: 600;
+}
 
 .empty-state {
   display: flex;
@@ -420,6 +541,7 @@ body {
   border-top: 3px solid #A100FF;
 }
 .kpi-card--full { grid-column: span 2; }
+.kpi-card--wide { grid-column: 1 / -1; }   /* linha inteira em qualquer largura */
 .kpi-num {
   font-size: 36px;
   font-weight: 800;
@@ -456,23 +578,14 @@ body {
   border-radius: 20px;
   padding: 4px 10px;
 }
+/* Cards de cliente: mesma linguagem da tag de cliente (gradiente de marca) */
+.kpi-card--client { position: relative; overflow: hidden; border-top-color: transparent; }
+.kpi-card--client::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--rnp-gradient); }
+.kpi-card--client .kpi-client-chip { background: var(--rnp-gradient); color: #131313; font-weight: 600; }
 
 
 
 
-.panorama-teaser {
-  margin: 20px 16px 40px;
-  background: var(--bg-surface);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-400);
-}
-.panorama-teaser .ms { color: var(--acc-purple); font-size: 20px; flex-shrink: 0; }
-.panorama-teaser p { font-size: 12px; line-height: 1.55; margin: 0; }
-.panorama-teaser strong { color: var(--text-300); font-weight: 500; display: block; font-size: 13px; margin-bottom: 2px; }
 
 /* ============================================================
    DETAIL OVERLAY
@@ -487,11 +600,17 @@ body {
   transform: translateX(-50%) translateY(100%);
   background: var(--bg-base);
   z-index: 200;
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), visibility 0s linear 0.3s;
   overflow-y: auto;
+  /* Fechado: não pode interceptar cliques nem receber foco */
+  visibility: hidden;
+  pointer-events: none;
 }
 .detail-overlay.open {
   transform: translateX(-50%) translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), visibility 0s;
 }
 .detail-backdrop {
   display: none;
@@ -664,7 +783,15 @@ body {
     align-self: flex-end;
   }
   .day-chip { min-width: 68px; padding: 10px 8px; }
-  .count-label { width: 100%; }
+  /* Dia + Cliente na mesma linha, alinhados pela base */
+  .filters-row {
+    flex: 0 0 auto; align-self: flex-end;
+    display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: flex-end;
+    gap: 16px 24px; margin-bottom: 0;
+  }
+  .filters-row .day-filter { align-self: auto; margin-bottom: 0; }
+  .filters-row .client-filter { width: 300px; margin-bottom: 0; }
+  .count-label { width: 100%; margin-top: 14px; }
   .cards-list {
     width: 100%;
     display: grid;
@@ -675,9 +802,10 @@ body {
   .kpi-grid {
     width: 100%;
     padding: 0;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
   }
   .kpi-card--full { grid-column: span 2; }
+  .kpi-card--viz { grid-column: span 2; }
 
   /* Modal centrado no desktop */
   .detail-overlay {
@@ -692,11 +820,12 @@ body {
     flex-direction: column;
     transform: translate(-50%, -50%) scale(0.96);
     opacity: 0;
-    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, visibility 0s linear 0.25s;
   }
   .detail-overlay.open {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, visibility 0s;
   }
   .detail-header { flex: 0 0 auto; position: static; padding: 16px 24px; }
   .detail-back { display: none; }
@@ -704,7 +833,6 @@ body {
   .detail-content { overflow-y: auto; flex: 1; padding: 28px 32px 32px; }
   .detail-backdrop { display: block; }
 
-  .panorama-teaser { margin: 24px 0 40px; }
 }
 
 /* ── Large desktop: 1400px+ ── */
@@ -738,13 +866,23 @@ body {
   <section class="screen" id="screen-clientes">
     <h1 class="screen-title">Nossos clientes<br>em outros palcos</h1>
 
-    <div class="day-filter" id="day-filter">
-      <div class="day-chip active" data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
-      <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
-      <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
-      <div class="day-chip"        data-day="14"><span class="wd">Sab</span><span class="dn">14 nov</span></div>
-    </div>
+    <div class="filters-row">
+      <div class="day-filter day-filter--6" id="day-filter">
+        <div class="day-chip active" data-day="all"><span class="wd">11–14</span><span class="dn">Todos</span></div>
+        <div class="day-chip"        data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
+        <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
+        <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
+        <div class="day-chip"        data-day="14"><span class="wd">Sab</span><span class="dn">14 nov</span></div>
+      </div>
 
+      <div class="client-filter" id="client-filter-cf">
+        <label class="client-filter-lbl" for="client-select-cf">Cliente</label>
+        <div class="client-filter-ctl">
+          <select class="client-select" id="client-select-cf"></select>
+          <button type="button" class="client-clear" id="client-clear-cf" aria-label="Limpar filtro de cliente" hidden><span class="ms">close</span></button>
+        </div>
+      </div>
+    </div>
     <p class="count-label" id="count-label"></p>
     <div class="cards-list" id="cards-container"></div>
   </section>
@@ -753,32 +891,41 @@ body {
   <section class="screen active" id="screen-submissoes">
     <h1 class="screen-title">Nossa programação<br>para o festival</h1>
     <div class="day-filter" id="day-filter-s">
-      <div class="day-chip active" data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
+      <div class="day-chip active" data-day="all"><span class="wd">11–13</span><span class="dn">Todos</span></div>
+      <div class="day-chip"        data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
       <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
       <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
-      <div class="day-chip"        data-day="14"><span class="wd">Sab</span><span class="dn">14 nov</span></div>
     </div>
     <p class="count-label" id="count-label-s"></p>
     <div class="cards-list" id="cards-container-s"></div>
   </section>
   <section class="screen" id="screen-convida">
     <h1 class="screen-title">Convidamos<br>nossos clientes</h1>
-    <div class="day-filter" id="day-filter-c">
-      <div class="day-chip active" data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
-      <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
-      <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
-      <div class="day-chip"        data-day="14"><span class="wd">Sab</span><span class="dn">14 nov</span></div>
+    <div class="filters-row">
+      <div class="day-filter" id="day-filter-c">
+        <div class="day-chip active" data-day="all"><span class="wd">11–13</span><span class="dn">Todos</span></div>
+        <div class="day-chip"        data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
+        <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
+        <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
+      </div>
+      <div class="client-filter" id="client-filter-c">
+        <label class="client-filter-lbl" for="client-select-c">Cliente</label>
+        <div class="client-filter-ctl">
+          <select class="client-select" id="client-select-c"></select>
+          <button type="button" class="client-clear" id="client-clear-c" aria-label="Limpar filtro de cliente" hidden><span class="ms">close</span></button>
+        </div>
+      </div>
     </div>
     <p class="count-label" id="count-label-c"></p>
     <div class="cards-list" id="cards-container-c"></div>
   </section>
   <section class="screen" id="screen-convidada">
-    <h1 class="screen-title">Accenture<br>em outros palcos</h1>
+    <h1 class="screen-title">Accenture convidada<br>para outros palcos</h1>
     <div class="day-filter" id="day-filter-fomos">
-      <div class="day-chip active" data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
+      <div class="day-chip active" data-day="all"><span class="wd">11–13</span><span class="dn">Todos</span></div>
+      <div class="day-chip"        data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
       <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
       <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
-      <div class="day-chip"        data-day="14"><span class="wd">Sab</span><span class="dn">14 nov</span></div>
     </div>
     <p class="count-label" id="count-label-fomos"></p>
     <div class="cards-list" id="cards-container-fomos"></div>
@@ -787,44 +934,51 @@ body {
     <h1 class="screen-title">Nossa presença<br>no Rec N Play</h1>
     <div class="kpi-grid">
       <div class="kpi-card">
-        <span class="kpi-num">29</span>
+        <span class="kpi-num" id="kpi-atividades">29</span>
         <span class="kpi-label">Atividades</span>
         <span class="kpi-desc">submetidas pela Accenture ao festival</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-num">42</span>
+        <span class="kpi-num" id="kpi-vozes">–</span>
         <span class="kpi-label">Vozes Accenture</span>
-        <span class="kpi-desc">profissionais únicos em palco</span>
+        <span class="kpi-desc">profissionais únicos em palco, nas nossas atividades e nas de outros</span>
       </div>
-      <div class="kpi-card kpi-card--full">
-        <span class="kpi-num">6</span>
+      <div class="kpi-card kpi-card--full kpi-card--client">
+        <span class="kpi-num" id="kpi-clientes-palco">–</span>
+        <span class="kpi-label">Clientes no nosso palco</span>
+        <span class="kpi-desc">clientes Accenture que convidamos para as nossas atividades</span>
+        <div class="kpi-clients" id="kpi-chips-palco"></div>
+      </div>
+      <div class="kpi-card kpi-card--wide kpi-card--client">
+        <span class="kpi-num" id="kpi-clientes-fest">–</span>
         <span class="kpi-label">Clientes no festival</span>
-        <span class="kpi-desc">clientes Accenture que subiram ao palco conosco</span>
-        <div class="kpi-clients">
-          <span class="kpi-client-chip">LDC</span>
-          <span class="kpi-client-chip">Ipiranga</span>
-          <span class="kpi-client-chip">Banco do Brasil</span>
-          <span class="kpi-client-chip">Bradesco Seguros</span>
-          <span class="kpi-client-chip">Natura</span>
-          <span class="kpi-client-chip">Globo</span>
-        </div>
+        <span class="kpi-desc">clientes Accenture presentes em toda a programação: nossas atividades e as demais</span>
+        <div class="kpi-clients" id="kpi-chips-fest"></div>
       </div>
-    </div>
-    <div class="panorama-teaser">
-      <span class="ms">auto_awesome</span>
-      <div>
-        <strong>Mais visões em breve</strong>
-        <p>Presença por dia, temas em destaque e muito mais.</p>
+      <div class="kpi-card kpi-card--viz" id="viz-ranking">
+        <span class="kpi-label">Ranking de clientes</span>
+        <span class="kpi-desc">atividades por cliente em todo o festival · toque num cliente para ver a programação dele</span>
+        <div class="viz-legend" aria-hidden="true">
+          <span><i class="viz-dot viz-dot--out"></i>outros palcos</span>
+          <span><i class="viz-dot viz-dot--our"></i>nosso palco</span>
+        </div>
+        <div class="rank-list" id="rank-list"></div>
+        <button type="button" class="rank-toggle" id="rank-toggle" aria-expanded="false" aria-controls="rank-list"></button>
+      </div>
+      <div class="kpi-card kpi-card--viz" id="viz-locais">
+        <span class="kpi-label">Onde estamos</span>
+        <span class="kpi-desc">Locais onde temos as atividades</span>
+        <div class="venue-list" id="venue-list"></div>
       </div>
     </div>
   </section>
   <section class="screen" id="screen-innov">
-    <h1 class="screen-title">Programação Rec N Play<br>no IC</h1>
+    <h1 class="screen-title">Toda a programação do Rec N Play<br>prevista para o IC</h1>
     <div class="day-filter" id="day-filter-i">
-      <div class="day-chip active" data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
+      <div class="day-chip active" data-day="all"><span class="wd">11–13</span><span class="dn">Todos</span></div>
+      <div class="day-chip"        data-day="11"><span class="wd">Qua</span><span class="dn">11 nov</span></div>
       <div class="day-chip"        data-day="12"><span class="wd">Qui</span><span class="dn">12 nov</span></div>
       <div class="day-chip"        data-day="13"><span class="wd">Sex</span><span class="dn">13 nov</span></div>
-      <div class="day-chip"        data-day="14"><span class="wd">Sab</span><span class="dn">14 nov</span></div>
     </div>
     <p class="count-label" id="count-label-i"></p>
     <div class="cards-list" id="cards-container-i"></div>
@@ -854,145 +1008,958 @@ function avatarColor(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))&0xffff
 function initials(n){const p=n.trim().split(/\s+/);return(p.length>=2)?(p[0][0]+p[p.length-1][0]).toUpperCase():n.slice(0,2).toUpperCase();}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
+/* ================================================================
+   TAG DE CLIENTE ACCENTURE
+   Regra: a tag só aparece quando algum PARTICIPANTE atua numa empresa-cliente.
+   Casa pelo campo `company` do palestrante (nunca pelo nome da pessoa, nem por
+   `client` da atividade) e ignora quem é da Accenture.
+   ================================================================ */
+const CLIENT_COMPANIES = [
+  ["Banco do Brasil",        /\bbanco do brasil\b/],
+  ["Itaú",                   /\bitau\b/],
+  ["Globo",                  /\bglobo(news)?\b/],
+  ["Baterias Moura",         /\b(grupo|baterias) moura\b/],
+  ["Stellantis",             /\bstellantis\b/],
+  ["Bradesco",               /\bbradesco\b/],
+  ["LDC",                    /^ldc\b/],
+  ["Ipiranga",               /\bipiranga\b/],
+  ["Natura",                 /\bnatura\b/],
+  ["Algar",                  /\balgar\b/],
+  ["Solar Coca-Cola",        /\bsolar\b.*\bcoca|\bcoca[- ]cola\b/],
+  ["Caixa",                  /^caixa( economica( federal)?)?$/],
+  ["Mercado Livre",          /\bmercado ?livre\b/],
+  ["Real Hospital Português",/\breal hospital portugues\b/],
+  ["Heineken",               /\bheineken\b/],
+  ["Petrobras",              /\bpetrobras\b/],
+  ["Nestlé Brasil",          /\bnestle\b/],
+  ["Azul",                   /\bazul\b/],
+  ["Grupo Boticário",        /\bboticario\b/],
+  ["Magalu",                 /\bmagalu\b|\bmagazine luiza\b/],
+  ["Samsung",                /\bsamsung\b/],
+  ["Google",                 /\bgoogle\b/]
+];
+const normCo = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
+
+/* ================================================================
+   LINHA DE PARTICIPANTES DO CARD — REGRA UNIVERSAL
+   Todos os participantes, cada um com primeiro e segundo nome (nome composto
+   com partícula, ex.: "Marcos de Freitas", é mantido inteiro). Uma única linha;
+   se não couber na largura do card, termina em reticências (CSS: .meta-spk).
+   O nome completo de todos fica no title (hover) e no detalhe da atividade.
+   ================================================================ */
+const NAME_PARTICLES = new Set(["de","da","do","das","dos","e"]);
+function shortName(full){
+  const t = (full||"").trim().split(/\s+/);
+  if(t.length<=2) return t.join(" ");
+  const second = t[1].replace(/\.$/,"");
+  const take = (NAME_PARTICLES.has(second.toLowerCase()) || second.length===1) ? 3 : 2;
+  return t.slice(0,take).join(" ");
+}
+function spkLine(list){
+  const n = (list||[]).map(s=>shortName(s.name)).filter(Boolean);
+  if(n.length<=1) return n.join("");
+  return n.slice(0,-1).join(", ") + " e " + n[n.length-1];
+}
+const joinNames = a => { a=(a||[]).filter(Boolean); return a.length<2 ? a.join("") : a.slice(0,-1).join(", ")+" e "+a[a.length-1]; };
+const spkTitle = list => (list||[]).map(s=>s.name).join(", ");
+
+/* Cliente selecionado no dropdown de cada aba ("" = todos) */
+const filtroCliente = { cf:"", c:"" };
+
+/* Clientes de uma atividade: participantes clientes + clientes que a oferecem */
+function actClients(act){
+  const s = new Set(clientNames(act));
+  if(act.isOfferedBy) (act.clients||[act.client]).filter(Boolean).forEach(c=>s.add(c));
+  return [...s];
+}
+function clientNames(act){
+  if(Array.isArray(act.clientTags)) return act.clientTags;   // base marca [CLIENTE] explicitamente
+  const found = [];
+  (act.speakers||[]).forEach(s=>{
+    const co = normCo(s.company) || normCo(s.role);   // sem empresa, vale o cargo ("Diretora MKT Samsung...")
+    if(!co || co.includes("accenture")) return;
+    const hit = CLIENT_COMPANIES.find(([,re])=>re.test(co));
+    if(hit && !found.includes(hit[0])) found.push(hit[0]);
+  });
+  return found;
+}
+function clientTagsHtml(act){
+  return clientNames(act).map(n=>`<span class="tag tag-client-name">${esc(n)}</span>`).join("");
+}
+
+/* ================================================================
+   FILTRO DE DATA — "Todos" (padrão) + dias 11–14
+   - dayList: filtra pelo dia (ou devolve tudo) sempre ordenado por data e hora
+   - cardsHtml: em "Todos", agrupa por data com cabeçalho — os dias nunca se misturam
+   ================================================================ */
+const chipDay = el => el.dataset.day==="all" ? "all" : parseInt(el.dataset.day,10);
+
+/* "10:00-11:15" | "09:00" | "Bloco 14h-18h"  ->  minutos desde 00:00 do início */
+function timeKey(t){
+  const m=/(\d{1,2})(?:[:h](\d{2}))?/.exec(t||"");
+  return m ? parseInt(m[1],10)*60+(parseInt(m[2],10)||0) : 24*60;
+}
+function dayList(src, day, client){
+  let base = day==="all" ? src : src.filter(a=>a.day===day);
+  if(client) base = base.filter(a=>actClients(a).includes(client));
+  return base.map((a,i)=>[a,i])
+    .sort((x,y)=> x[0].day-y[0].day || timeKey(x[0].time)-timeKey(y[0].time) || x[1]-y[1])
+    .map(x=>x[0]);
+}
+const DAY_HEAD = {11:"Quarta-feira · 11 de novembro",12:"Quinta-feira · 12 de novembro",13:"Sexta-feira · 13 de novembro",14:"Sábado · 14 de novembro"};
+function cardsHtml(list, day, renderFn){
+  if(day!=="all") return list.map(renderFn).join("");
+  const days=[...new Set(list.map(a=>a.day))];
+  return days.map(d=>{
+    const group=list.filter(a=>a.day===d);
+    return `<h2 class="day-group-title"><span>${DAY_HEAD[d]||d+" de novembro"}</span><span class="day-group-count">${group.length} atividade${group.length>1?"s":""}</span></h2>`
+      + group.map(renderFn).join("");
+  }).join("");
+}
+
+/* ================================================================
+   CLIENTES PELO FEST — 91 atividades (11/11: 31 · 12/11: 33 · 13/11: 24 · 14/11: 3)
+   Fonte: RecNPlay_Clientes_Pelo_Fest_Atividades.txt | revisão 2 — 10/11/2026
+   clientTags = clientes marcados [CLIENTE] na base (tag em gradiente); sem marca = oferecida pelo cliente.
+   ================================================================ */
 const activities = [
-  /* ===== DIA 11 ===== */
-  { id:"act-12", day:11, time:"10:00-11:15", client:"Mercado Livre",
-    title:"Do play a compra: conteudo, entretenimento e a estrategia do Mercado Livre",
+  { id:"cf-b0faef96", day:11, time:"08:00-17:00", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Baterias Moura", format:"Ativacao Rua",
+    title:"Test Ride Ella | Conheça a Bike Elétrica da Moura",
+    location:"Torre Malakoff",
+    speakers:[
+      {name:"Bike Ella",role:"",company:""}
+    ]
+  },
+  { id:"cf-9a4d98b4", day:11, time:"10:00-14:00", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Globo", format:"Oficina",
+    title:"Oficina Broadcast: Do ao vivo à edição: Uma experiência prática de Broadcast",
+    location:"E.T.E. Porto Digital - Sala Maker",
+    speakers:[
+      {name:"Guttemberg Sampaio Miranda",role:"Líde de Tecnologia",company:"Tv Globo",isClient:true},
+      {name:"Ícaro Antônio Marques Rodrigues",role:"",company:""},
+      {name:"Tamires Silva de Lima",role:"",company:""},
+      {name:"Allana Mara Bilar Marques",role:"Técnica de Sistemas Audiovisuais Ii",company:"Globo Comunicação e Participações S.a.",isClient:true},
+      {name:"Carla Silva",role:"",company:""},
+      {name:"Erlania",role:"",company:""}
+    ]
+  },
+  { id:"cf-b14a1af3", day:11, time:"10:00-19:00", client:"Globo", clients:["Globo"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Globo", format:"Hackathon",
+    title:"Desafio Globo",
+    location:"Cesar School - Bloco B - Sala 202",
+    speakers:[]
+  },
+  { id:"cf-337dc5b5", day:11, time:"10:00-11:00", client:"Azul", clients:["Azul"], clientTags:["Azul"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"Como transformar IA em Diferencial Estratégico",
+    location:"Arena Pernambuco de Negócios - NERD 2º andar - Palco Asa Branca",
+    speakers:[
+      {name:"Helder Lins",role:"Head de TI da TTWORK",company:""},
+      {name:"Henrique Rabenhorst",role:"CIO da Azul Linhas Aéreas",company:"",isClient:true},
+      {name:"Ascânio França",role:"CEO e Co-founder",company:"FBR Digital"}
+    ]
+  },
+  { id:"cf-c8d33de9", day:11, time:"10:00-11:00", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"NTT DATA", format:"Roda de Conversa",
+    title:"O futuro começa agora: Carreira e tecnologia na era da transformação",
+    location:"Moinho Recife - NTT DATA - Auditório",
+    speakers:[
+      {name:"Graziele Grandi",role:"",company:""},
+      {name:"Nalygia Rhayanne Campêlo de Barros",role:"Analista Funcional de Soluções e Plataformas Júnior",company:"Ntt Data"},
+      {name:"Gustavo de Souza Silva Rodrigues",role:"Gerente Senior Tecnologia",company:"Bradesco Sa.",isClient:true}
+    ]
+  },
+  { id:"cf-be0e5e38", day:11, time:"10:00-10:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Municípios Inteligentes: como transformar tecnologia em valor para as cidades e para as pessoas",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Michele Azevedo Alencar",role:"Head",company:"Banco Brasil"}
+    ]
+  },
+  { id:"cf-12da165f", day:11, time:"10:00-11:15", client:"Mercado Livre", clients:["Mercado Livre"], clientTags:["Mercado Livre"],
+    offeredBy:"Silvio Meira e Rosário Pompeia", format:"Debate",
+    title:"Do play à compra: conteúdo, entretenimento e a estratégia do Mercado Livre",
     location:"Cesar School - Bloco B - Sala 001 e 002",
     speakers:[
-      {name:"Stephanie Romeiro",  role:"Gerente Senior de Branding",company:"Mercado Livre",isClient:true},
-      {name:"Rosario Pompeia",    role:"Fundadora",                  company:"LeFil Company",isClient:false}
+      {name:"Rosário Pompéia",role:"Fundadora",company:"LeFil Company"},
+      {name:"Stephanie Romeiro",role:"Gerente Sênior de Branding",company:"Mercado Livre",isClient:true}
     ]
   },
-  { id:"act-13", day:11, time:"11:40-12:40", client:"Real Hospital Portugues",
+  { id:"cf-8bf3317c", day:11, time:"10:00-18:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Universo Fanta",
+    location:"Boulevard Rio Branco",
+    speakers:[]
+  },
+  { id:"cf-ced08555", day:11, time:"10:00-19:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Gestão de Resíduos e Sustentabilidade",
+    location:"Boulevard Rio Branco",
+    speakers:[]
+  },
+  { id:"cf-10cc675e", day:11, time:"10:20-11:20", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Marianna Maldi Veras", format:"Roda de Conversa",
+    title:"“Mulher macho, sim senhor?” Precisamos masculinizar a força feminina para ocupar as áreas de STEM?",
+    location:"Ti.Saúde",
+    speakers:[
+      {name:"Marianna Maldi Veras",role:"Analista de Infraestrutura",company:"Globo",isClient:true},
+      {name:"Thayana Pereira de Almeida",role:"Product e Service Design",company:"Accenture"},
+      {name:"Bárbara Maia",role:"Team lead",company:"Trillia"}
+    ]
+  },
+  { id:"cf-a98a99af", day:11, time:"11:00-11:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"AcademIA BB 2026: A IA não transforma organizações, pessoas capacitadas transformam",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Vinicius Faria Ramos",role:"Assessor de TI",company:"Banco do Brasil",isClient:true},
+      {name:"Sabrina Soares Oliveira Duarte",role:"Assessora",company:"Banco do Brasil",isClient:true},
+      {name:"Andressa Alves de Oliveira",role:"",company:""}
+    ]
+  },
+  { id:"cf-4d80fc2e", day:11, time:"11:20-12:05", client:"Petrobras", clients:["Petrobras"], clientTags:["Petrobras"],
+    offeredBy:"Petrobras", format:"Palestra",
+    title:"Inovação na vida real: desafios da inovação e transformação digital na indústria",
+    location:"Moinho Recife - Lounge",
+    speakers:[
+      {name:"Roberta Nunes Souza",role:"Coordenadora de Automação e Digitalização",company:"Petrobras - Rnest",isClient:true}
+    ]
+  },
+  { id:"cf-287457ec", day:11, time:"11:20-12:20", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"Como startups podem acelerar inovação e crescimento dos bancos num cenário cada vez mais competitivo?",
+    location:"Arena Pernambuco de Negócios - NERD 3º andar - Palco Carcará",
+    speakers:[
+      {name:"Mauro França Rangel",role:"Diretor Executivo - Banco Inter",company:""},
+      {name:"Caio Cassano",role:"Diretor de Crédito - Banco Pan",company:""},
+      {name:"André Carneiro",role:"CEO - BBChain",company:""},
+      {name:"Renata Petrovic",role:"Head de Inovação - Bradesco",company:"",isClient:true},
+      {name:"Mauricio Teramoto",role:"Diretor Dados e Analytics - Trillia B3",company:""}
+    ]
+  },
+  { id:"cf-87e2ee12", day:11, time:"11:20-12:20", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Globo", format:"Roda de Conversa",
+    title:"Como a Globo vem estruturando o uso de inteligência artificial nos fluxos de conteúdo a partir do Globo Mídia",
+    location:"Sede Porto Digital - Sala Pontes",
+    speakers:[
+      {name:"Amanda Vizone Gouvea",role:"",company:""},
+      {name:"Fábio de Arruda Cavalcanti",role:"Gestor de Acervo",company:"Globo",isClient:true}
+    ]
+  },
+  { id:"cf-a69a95ad", day:11, time:"11:40-12:40", client:"Real Hospital Português", clients:["Real Hospital Português"], clientTags:["Real Hospital Português"],
+    offeredBy:"Henrique Steinberg e Mariângela Schoenacker", format:"Roda de Conversa",
     title:"Novos modelos de moradia para longevidade",
-    location:"Moeda 50 - Auditorio Hall",
+    location:"Moeda 50 - Auditório Hall",
     speakers:[
-      {name:"Shenandoan Alexandre Daur",role:"CIO",                      company:"Real Hospital Portugues",isClient:true},
-      {name:"Celia da Fonte Longman",   role:"Empresaria",               company:"Geracao X Mais",         isClient:false},
-      {name:"Yara Scherb",              role:"Arquiteta e Diretora geral",company:"Scherb Arquitetura",    isClient:false},
-      {name:"Diogo Lima Nogueira",      role:"CEO",                      company:"Yolo Coliving",          isClient:false},
-      {name:"Mariangela Schoenacker",   role:"Diretora Executiva",       company:"Alinhavo",               isClient:false}
+      {name:"Celia da Fonte Longman",role:"Empresaria",company:"Geração X Mais"},
+      {name:"Yara Scherb",role:"Arquiteta Diretora geral",company:"Scherb Arquitetura"},
+      {name:"Shenandoan Alexandre Daur",role:"Cio",company:"Real Hospital Português de Beneficência em Pernambuco",isClient:true},
+      {name:"Diogo Lima Nogueira",role:"Ceo",company:"Yolo Coliving"},
+      {name:"Mariangela Schoenacker",role:"Diretora Executiva",company:"Alinhavo"}
     ]
   },
-  { id:"act-06", day:11, time:"13:00-14:00", client:"Bradesco",
-    title:"Agentes de IA vao substituir desenvolvedores? Produtividade real vs. hype na engenharia de software",
-    location:"Moeda 50 - Auditorio Hall",
+  { id:"cf-4820a0e8", day:11, time:"12:00-12:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Ponto BB: O laboratório que testou a agência do futuro",
+    location:"Ponto BB - Palco BBDW",
     speakers:[
-      {name:"Dali Freire Dias dos Santos",        role:"Software Engineer Specialist II",company:"Bradesco",isClient:true},
-      {name:"Roque Jose Ribeiro da Silva Junior",  role:"Software Engineer Manager",     company:"Bradesco",isClient:true},
-      {name:"Bruno Campello de Souza",            role:"Professor e Pesquisador",         company:"UFPE",    isClient:false},
-      {name:"Starch Melo de Souza",               role:"CEO",                            company:"AppCETech",isClient:false}
+      {name:"Millena Martins Braga Daldegan",role:"Gerente de soluções",company:"Banco do Brasil",isClient:true}
     ]
   },
-  { id:"act-02", day:11, time:"14:00-15:15", client:"Globo",
-    title:"Hoje, amanha e depois: o que vai mover os mercados e o marketing em 2027?",
-    location:"Arena Pernambuco de Negocios - NERD Terreo - Auditorio",
+  { id:"cf-424a524c", day:11, time:"12:00-13:00", client:"Magalu", clients:["Magalu"], clientTags:["Magalu"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"O poder das comunidades tech",
+    location:"Espaço Educa Recife'Play - Paço Alfândega",
     speakers:[
-      {name:"Cristovam Ferrara",    role:"Diretor de Valor Social",                           company:"Globo",        isClient:true},
-      {name:"Silvio Meira",         role:"Fundador e Cientista Chefe",                        company:"TDS Company",  isClient:false},
-      {name:"Rosario Pompeia",      role:"Fundadora",                                         company:"LeFil Company",isClient:false},
-      {name:"Sergio Gordilho",      role:"Cofundador, Copresidente e CCO",                    company:"Africa Creative",isClient:false},
-      {name:"Ionah Kochen",         role:"VP de Marketing, Comunicacao Corporativa & ESG",    company:"Nestle Brasil",isClient:false}
+      {name:"Barbara Rodrigues",role:"Coordenadora de Formação",company:"Porto Digital"},
+      {name:"Lucas Victor Carneiro da Silva Ximenes",role:"Desenvolvedor Front End Jr",company:"Recife Front End Community"},
+      {name:"Tereza Oliveira",role:"Diretora Excutiva - Virada no Café",company:""},
+      {name:"Petros Barreto da Silva",role:"Coordenador de sistemas",company:"Magalu Cloud",isClient:true},
+      {name:"Caio Emanoel Serpa Lopes",role:"Analista de Dados Sr/Co-founder Dse Community",company:"Dse Community"}
     ]
   },
-
-  /* ===== DIA 12 ===== */
-  { id:"act-07", day:12, time:"10:00-12:00", client:"Bradesco",
-    title:"Da intuicao a evidencia: Como os dados estao transformando a conscientizacao em seguranca da informacao",
-    location:"Moeda 50 - Auditorio Hall",
+  { id:"cf-f1b58abb", day:11, time:"13:00-13:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"O comportamento dos clientes e o fim da fronteira entre físico e digital",
+    location:"Ponto BB - Palco BBDW",
     speakers:[
-      {name:"Valter Parisoto Dias",             role:"Analista de Seguranca da Informacao III",company:"Bradesco",isClient:true},
-      {name:"Renata Gomes Vigido",              role:"Analista de Seguranca da Informacao III",company:"Bradesco",isClient:true},
-      {name:"Renata Sabiao Marques Passarinho", role:"Information Security Tech Manager",      company:"Bradesco",isClient:true}
+      {name:"Gustavo Scortegagna",role:"Gerente Executivo",company:"Banco do Brasil",isClient:true}
     ]
   },
-  { id:"act-algar", day:12, time:"12:40-13:40", client:"Algar",
-    isOfferedBy:true,
-    title:"Transformando a intencao estrategica em entrega, sem loucurao.",
-    location:"Moinho Recife - Auditorio",
+  { id:"cf-57aaa6f0", day:11, time:"13:00-14:00", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"Moeda 50", format:"Debate",
+    title:"Agentes de IA vão substituir desenvolvedores? Produtividade real vs. hype na engenharia de software",
+    location:"Moeda 50 - Auditório Hall",
     speakers:[
-      {name:"Alex Salino", role:"CEO", company:"Cadmus / Beefor", isClient:false}
+      {name:"Dali Freire Dias dos Santos",role:"SOFTWARE ENGINEER SPECIALIST II",company:"Banco Bradesco S.A.",isClient:true},
+      {name:"Roque José Ribeiro da Silva Junior",role:"SOFTWARE ENGINEER MANAGER",company:"Banco Bradesco S.A.",isClient:true},
+      {name:"Bruno Campello de Souza",role:"Professor e Pesquisador",company:"Universidade federal de Pernambuco"},
+      {name:"Starch Melo de Souza",role:"CEO",company:"AppCETech"}
     ]
   },
-  { id:"act-15", day:12, time:"15:20-16:20", client:"Petrobras",
-    title:"Alem da Ideia: Intraempreendedorismo em Escala (100 em 5) nos Desafios Inovadores do Oleo e Gas",
+  { id:"cf-4c492220", day:11, time:"14:00-15:00", client:"Globo", clients:["Globo","Nestlé Brasil"], clientTags:["Globo","Nestlé Brasil"],
+    offeredBy:"Silvio Meira e Rosário Pompeia", format:"Debate",
+    title:"Hoje, amanhã e depois: o que vai mover o marketing em 2027?",
+    location:"Arena Pernambuco de Negócios - NERD Térreo - Auditório",
+    speakers:[
+      {name:"Silvio Meira",role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School",company:""},
+      {name:"Rosário Pompéia",role:"Fundadora",company:"LeFil Company"},
+      {name:"Cristovam Ferrara",role:"Diretor de Valor Social",company:"Globo",isClient:true},
+      {name:"Sérgio Gordilho",role:"Cofundador, sócio, copresidente e Chief Creative Officer (CCO)",company:"Africa Creative"},
+      {name:"Ionah Kochen",role:"Vice-Presidente de Marketing, Comunicação Corporativa & Esg",company:"Nestlé Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-ed935165", day:11, time:"14:00-14:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Contexto aumentado em LLMs: conectando Modelos, dados e conhecimento",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Lucas Araujo",role:"Especialista em diversidade e inclusão",company:"Blend Edu"}
+    ]
+  },
+  { id:"cf-cdbf7e13", day:11, time:"14:20-15:20", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"NTT DATA", format:"Roda de Conversa",
+    title:"A Revolução do Crédito: O Papel dos Agentes de IA",
+    location:"Moinho Recife - NTT DATA - Auditório",
+    speakers:[
+      {name:"Adriano Anicio Vieira",role:"Gerente de Tecnologia",company:"Banco do Brasil",isClient:true},
+      {name:"Derick Andre Marcelino Vicente dos Santos",role:"Product manager",company:"Banco do Brasil",isClient:true},
+      {name:"Carlos Toneto",role:"",company:""}
+    ]
+  },
+  { id:"cf-9f058597", day:11, time:"14:20-15:20", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Globo", format:"Debate",
+    title:"All in one: O presente da operação na TV",
+    location:"Sede Porto Digital - Cinema do Porto",
+    speakers:[
+      {name:"Clarissa Cardoso de Araujo Costa",role:"Coord Captação e Produção",company:"Globo",isClient:true},
+      {name:"Mike Andrade",role:"",company:""},
+      {name:"Kassandra Silva de Lima Leite",role:"Dtv",company:"Globo",isClient:true},
+      {name:"Cibelle Maimone",role:"",company:""}
+    ]
+  },
+  { id:"cf-9fa23d8d", day:11, time:"15:00-15:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Agentes e dados Sintéticos: previsibilidade de futuro com IA",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Mácio Arruda",role:"Senior Tech Data Science Manager",company:"CESAR"}
+    ]
+  },
+  { id:"cf-87294ec3", day:11, time:"15:00-15:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"A Era da Proteção Inteligente: Quando jornadas inteligentes e IA passam a cuidar da vida financeira das Pessoas",
+    location:"Sede Porto Digital - Sala Pontes",
+    speakers:[
+      {name:"Thiago Affonso Borsari",role:"Diretor TI e Portfólio",company:"BB Seguros",isClient:true}
+    ]
+  },
+  { id:"cf-4c1db574", day:11, time:"15:20-16:20", client:"Real Hospital Português", clients:["Real Hospital Português"], clientTags:["Real Hospital Português"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"Negócios em Saúde: Desafios e Oportunidades — Onde a tecnologia está causando mais impacto?",
+    location:"Arena Pernambuco de Negócios - NERD 2º andar - Palco Asa Branca",
+    speakers:[
+      {name:"Fernando Sales",role:"Professor",company:"UFPE"},
+      {name:"Claudia Alencar",role:"Senior Diretor tecnologia",company:""},
+      {name:"Ramon Maia",role:"Diretor de Estratégia de Negócios - MV",company:""},
+      {name:"Shenandoan Alexandre Daur",role:"Cio",company:"Real Hospital Português de Beneficência em Pernambuco",isClient:true},
+      {name:"Zeev Katz",role:"Head Consultant",company:"Labvie"}
+    ]
+  },
+  { id:"cf-9b4b44dd", day:11, time:"16:00-17:30", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Globo", format:"Debate",
+    title:"MOVIMENTO LED APRESENTA: “Educar pela memória - O legado que atravessa gerações”:",
+    location:"Moinho Recife - Auditório",
+    speakers:[
+      {name:"Roger de Renor",role:"",company:""},
+      {name:"Luís Adolpho",role:"",company:""},
+      {name:"Goretti França",role:"",company:""},
+      {name:"Gustavo Ferreira",role:"Repórter",company:"Tv Globo Pernambuco",isClient:true}
+    ]
+  },
+  { id:"cf-fa4852bc", day:11, time:"16:00-16:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"Agentes de IA orquestrada por humanos",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Virgínia Heimann",role:"Diretora na NTT Data Brasil",company:"NTT Data Brasil"},
+      {name:"Daniela Griecco",role:"Head of Data &AI",company:"Ntt Data"},
+      {name:"Ivan Lincoln de Paula Brum",role:"Head of AI Office",company:"Ntt Data"}
+    ]
+  },
+  { id:"cf-19447faa", day:11, time:"17:00-17:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Raízes antes de frutos: cultura, estratégia e coragem para reinventar a empresa com IA",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Antônio do Rêgo Valença",role:"Ceo",company:"Pitang"}
+    ]
+  },
+  { id:"cf-c0ff5a32", day:11, time:"18:00-18:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Seu produto digital funciona! Mas é seguro?",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Jhon Wilker Sousa",role:"Analista",company:"Banco do Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-85742732", day:11, time:"18:20-19:00", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:["Baterias Moura"],
+    offeredBy:"Ampla", format:"Debate",
+    title:"Varejo é verbo. Eu varejo, tu varejas, nós varejamos.",
+    location:"Moinho Recife - Lounge",
+    speakers:[
+      {name:"Gabi Pires",role:"Coordenadora de Planejamento",company:"Ampla"},
+      {name:"Mariana Lisboa",role:"Gerente de Marketing",company:"Grupo Moura",isClient:true},
+      {name:"Jéssica Almeida",role:"Gerente de Marketing",company:"Novo Atacarejo"}
+    ]
+  },
+  { id:"cf-03a44d20", day:12, time:"08:00-17:00", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Baterias Moura", format:"Ativacao Rua",
+    title:"Test Ride Ella | Conheça a Bike Elétrica da Moura",
+    location:"Torre Malakoff",
+    speakers:[
+      {name:"Bike Ella",role:"",company:""}
+    ]
+  },
+  { id:"cf-01d48026", day:12, time:"10:00-19:00", client:"Globo", clients:["Globo"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Globo", format:"Hackathon",
+    title:"Desafio Globo",
+    location:"Cesar School - Bloco B - Sala 202",
+    speakers:[]
+  },
+  { id:"cf-9cb428e0", day:12, time:"10:00-10:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"O agente vai às compras",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Derick Andre Marcelino Vicente dos Santos",role:"Product manager",company:"Banco do Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-3fefd10d", day:12, time:"10:00-12:00", client:"Stellantis", clients:["Stellantis"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Stellantis", format:"Visita Guiada",
+    title:"Visita Software Center 2026 -  Manhã",
+    location:"Software Center da Stellantis",
+    speakers:[
+      {name:"Gleice Santos",role:"",company:""}
+    ]
+  },
+  { id:"cf-877b3cb7", day:12, time:"10:00-19:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Gestão de Resíduos e Sustentabilidade",
+    location:"Boulevard Rio Branco",
+    speakers:[]
+  },
+  { id:"cf-57f97b82", day:12, time:"10:00-18:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Universo Fanta",
+    location:"Boulevard Rio Branco",
+    speakers:[]
+  },
+  { id:"cf-048dafa8", day:12, time:"10:00-12:00", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"Moeda 50", format:"Roda de Conversa",
+    title:"Da intuição à evidência: Como os dados estão transformando a conscientização em segurança da informação.",
+    location:"Moeda 50 - Auditório Hall",
+    speakers:[
+      {name:"Valter Parisoto Dias",role:"Analista de segurança da Informação III",company:"Bradesco",isClient:true},
+      {name:"Renata Gomes Vigido",role:"Analista de segurança da Informação III",company:"Bradesco",isClient:true},
+      {name:"Renata Sabião Marques Passarinho",role:"INFORMATION SECURITY TECH MANAGER",company:"Bradesco",isClient:true}
+    ]
+  },
+  { id:"cf-70fd3c9f", day:12, time:"10:20-13:00", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"The Developer's Conference 2026", format:"Evento",
+    title:"TDC Stage - Humanos, Agentes & Novas Dinâmicas de Trabalho",
+    location:"Moinho Recife - Cesar - Sala Manguezal",
+    speakers:[
+      {name:"Gyovana Santos do Prado",role:"Human in the Loop",company:"Supernova Labs"},
+      {name:"Felipe Rodrigo Lopes Soares da Silva",role:"Gerente de Sistemas",company:"Bradesco",isClient:true},
+      {name:"Sergio Luiz Monteiro Cerqueira",role:"Software engineer manager",company:"Bradesco",isClient:true},
+      {name:"Alex Amancio",role:"Project Manager",company:"Minsait"}
+    ]
+  },
+  { id:"cf-86f4f657", day:12, time:"11:00-11:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Inovação em Capital Humano: Como a IA Amplia Nossa Capacidade de Decidir",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Carla Rivas Meyer",role:"Assessora",company:"Banco do Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-0eeaa64a", day:12, time:"11:20-12:20", client:"Stellantis", clients:["Stellantis","Heineken"], clientTags:["Stellantis","Heineken"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"Indústria 4.0 na prática: o que já mudou dentro das fábricas",
+    location:"Arena Pernambuco de Negócios - NERD 2º andar - Palco Asa Branca",
+    speakers:[
+      {name:"Ian Correa",role:"Vice-presidente Grupo Aço Cearense",company:""},
+      {name:"Aldonso Martins",role:"Head of Digital Manufacturing",company:"Stellantis",isClient:true},
+      {name:"Anderson Belo",role:"Diretor Industrial da Heineken",company:"",isClient:true},
+      {name:"Carlos Simões",role:"Gerente executivo de manufatura digital",company:""},
+      {name:"Sergio Cavalcante",role:"Professor do Cin e ex Grupo Cornélio Brennand",company:""}
+    ]
+  },
+  { id:"cf-f36334a3", day:12, time:"11:20-12:05", client:"Petrobras", clients:["Petrobras"], clientTags:["Petrobras"],
+    offeredBy:"Petrobrás", format:"Palestra",
+    title:"Citizen Development: inovação digital de forma distribuída na Petrobras",
+    location:"Sede Porto Digital - Cinema do Porto",
+    speakers:[
+      {name:"Antonio Marcio Thevenard",role:"Gerente de Plataformas Digitais",company:"Petrobras",isClient:true}
+    ]
+  },
+  { id:"cf-e9efe3c4", day:12, time:"11:20-12:20", client:"Banco do Brasil", clients:["Banco do Brasil","Solar Coca-Cola"], clientTags:["Banco do Brasil","Solar Coca-Cola"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"Como levar um produto ao mercado hoje: lições sobre go-to-market de produtos físicos e digitais",
+    location:"Arena Pernambuco de Negócios - NERD 3º andar - Palco Carcará",
+    speakers:[
+      {name:"André Salles",role:"CEO da Solar Coca-Cola",company:"",isClient:true},
+      {name:"Pierre Lucena",role:"Presidente do Porto Digital",company:""},
+      {name:"Diogo Suzart",role:"Gerente Executivo da UNIDADE INTELIGENCIA",company:"Banco do Brasil",isClient:true},
+      {name:"Luiz Sergio Vieira",role:"CEO da Ernst & Young",company:""}
+    ]
+  },
+  { id:"cf-c4c1c173", day:12, time:"12:00-12:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil", format:"Palestra",
+    title:"Da IA que responde à IA que faz: Como os agentes estão mudando nossa relação com a tecnologia",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Alysson Nishiyama de Oliveira",role:"Especialista em TI",company:"Banco do Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-1ac8ea16", day:12, time:"12:40-13:40", client:"Algar", clients:["Algar"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Algar", format:"Palestra",
+    title:"Transformando a intenção estratégica em entrega, sem loucurão.",
+    location:"Moinho Recife - Auditório",
+    speakers:[
+      {name:"Alex Salino",role:"Ceo",company:"Cadmus / Beefor"}
+    ]
+  },
+  { id:"cf-a41449c2", day:12, time:"13:00-13:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"Skills em Movimento: da mudança à evolução no futuro do trabalho",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Pricilla Teixeira da Silva",role:"Bancário/Economiário",company:"Banco do Brasil",isClient:true},
+      {name:"Bruna Caricatti Capozzi Ventura",role:"Assessora",company:"Banco do Brasil",isClient:true},
+      {name:"Ana Alzira Rodrigues Rissi Frizzo",role:"",company:""}
+    ]
+  },
+  { id:"cf-3a829314", day:12, time:"14:00-15:00", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"Capgemini", format:"Debate",
+    title:"Além do Código: O Novo Papel do Profissional de TI",
+    location:"Cesar School - Bloco B - Sala 001 e 002",
+    speakers:[
+      {name:"Josue Nogueira dos Santos Junior",role:"Head da Capgemini Recife",company:"Capgemini"},
+      {name:"Ricardo Fabrini Filippetti",role:"Diretor",company:"Capgemini Brasil"},
+      {name:"Luciana Andrea Bordini",role:"Diretora de Intelligent Customer Operations",company:"Capgemini"},
+      {name:"Felipe Rodrigo Lopes Soares da Silva",role:"Gerente de Sistemas",company:"Bradesco",isClient:true}
+    ]
+  },
+  { id:"cf-c1737701", day:12, time:"14:00-14:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"Elas da TI: mulheres que lideram, negócios que se transformam",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Fernanda Breghirolli",role:"",company:""},
+      {name:"Noemi Rodrigues",role:"",company:""},
+      {name:"Angela Grochenisk de Lima Leal",role:"",company:""}
+    ]
+  },
+  { id:"cf-5741908e", day:12, time:"14:00-15:00", client:"Globo", clients:["Globo"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Globo", format:"Debate",
+    title:"IA para a produção de conteúdo",
+    location:"Sede Porto Digital - Cinema do Porto",
+    speakers:[
+      {name:"Amanda Vizone Gouvea",role:"",company:""},
+      {name:"Deny Cantieri",role:"",company:""},
+      {name:"Ana Regina Souza de Queiroz",role:"",company:""},
+      {name:"Vinícius Franco",role:"",company:""}
+    ]
+  },
+  { id:"cf-0cf02af7", day:12, time:"14:00-18:30", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"The Developer's Conference 2026", format:"Evento",
+    title:"TDC Stage - Produto, Discovery & Experimentação",
+    location:"Moinho Recife - Cesar - Sala Risoflora",
+    speakers:[
+      {name:"Izabella Cavalcanti",role:"Founder & Product Manager",company:"Casco"},
+      {name:"Danilo Amaral",role:"Arquiteto de Soluções",company:"Sensedia"},
+      {name:"Thyago T V Oliveira",role:"",company:""},
+      {name:"Michael Gavião",role:"",company:""},
+      {name:"Priscila David Moraes",role:"Product Owner",company:"Tv Globo",isClient:true}
+    ]
+  },
+  { id:"cf-22efc39b", day:12, time:"14:00-15:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:["Solar Coca-Cola"],
+    offeredBy:"Porto Digital", format:"Debate",
+    title:"Startup dentro de casa: como grandes empresas criam negócios novos",
+    location:"Arena Pernambuco de Negócios - NERD 3º andar - Palco Carcará",
+    speakers:[
+      {name:"Domingos Monteiro",role:"Conselheiro da Trillia e do NERD",company:""},
+      {name:"Gabriel Veloso",role:"Head de Inovação na Atlas Eletrodomésticos",company:""},
+      {name:"Leonardo Gusmão",role:"Group Product Manager da Solar Coca-Cola",company:"",isClient:true},
+      {name:"Fellipe Sabat",role:"Superintendente de Negócios e Produtos",company:"Porto Digital"}
+    ]
+  },
+  { id:"cf-60c9cb60", day:12, time:"14:00-15:00", client:"Real Hospital Português", clients:["Real Hospital Português"], clientTags:["Real Hospital Português"],
+    offeredBy:"Prefeitura do Recife", format:"Debate",
+    title:"Privacy by Design no SUS: proteção de dados e interoperabilidade como base para inovar em saúde",
+    location:"Moinho Recife - Auditório",
+    speakers:[
+      {name:"Sarelle Alves do Nascimento",role:"Advogada",company:"Prefeitura do Recife"},
+      {name:"Gustavo Sérgio de Godoy Magalhães",role:"Gerente Geral de Saúde Digital do Recife",company:"Prefeitura do Recife (Saúde Digital)"},
+      {name:"Ricardo Staciarini Puttini",role:"Professor e Empresário",company:"Ipes"},
+      {name:"Rodrigo de Melo Brennand",role:"Diretor Geral de Informatização e Inovação em Saúde",company:"Secretaria Estadual de Saúde de Pernambuco"},
+      {name:"Bartolomeu Martins",role:"Gerente de TI",company:"Real Hospital Português",isClient:true}
+    ]
+  },
+  { id:"cf-0c459f05", day:12, time:"14:00-15:15", client:"Samsung", clients:["Samsung"], clientTags:["Samsung"],
+    offeredBy:"Silvio Meira e Rosário Pompeia", format:"Debate",
+    title:"Marketing do Futuro na era da IA Native: o que faríamos diferente se começássemos hoje?",
+    location:"Accenture Innovation Center - Auditório",
+    speakers:[
+      {name:"Silvio Meira",role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School",company:""},
+      {name:"Rosário Pompéia",role:"Fundadora",company:"LeFil Company"},
+      {name:"Petria Chaves",role:"Jornalista e apresentadora",company:"CBN"},
+      {name:"Lucia Bittar",role:"Diretora MKT Samsung Galaxy experience",company:"",isClient:true}
+    ]
+  },
+  { id:"cf-a6010ae4", day:12, time:"14:20-16:20", client:"Stellantis", clients:["Stellantis"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Stellantis", format:"Visita Guiada",
+    title:"Visita Software Center 2026 -  Tarde",
+    location:"Software Center da Stellantis",
+    speakers:[
+      {name:"Gleice Santos",role:"",company:""}
+    ]
+  },
+  { id:"cf-45642558", day:12, time:"15:00-15:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Da necessidade ao produto: como transformar o olhar do cliente em negócios.",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Charlles Willian Lopes Ferreira",role:"",company:""}
+    ]
+  },
+  { id:"cf-a757c4dd", day:12, time:"15:20-16:20", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:["Solar Coca-Cola"],
+    offeredBy:"Porto Digital", format:"Sessão de Pitches",
+    title:"Pitch: Indústria em foco, conectando desafios a soluções",
+    location:"Arena Pernambuco de Negócios - NERD 3º andar - Palco Carcará",
+    speakers:[
+      {name:"Leonardo Gusmão",role:"Group Product Manager da Solar Coca-Cola",company:"",isClient:true},
+      {name:"Daniel Almeida",role:"CEO da Stepps",company:""},
+      {name:"Antônio Pedrosa",role:"CEO da Souv",company:""}
+    ]
+  },
+  { id:"cf-16b7ecbc", day:12, time:"15:20-16:20", client:"Grupo Boticário", clients:["Grupo Boticário"], clientTags:["Grupo Boticário"],
+    offeredBy:"Mesa Tech", format:"Roda de Conversa",
+    title:"DesAIgn: é tudo igual na era do piloto automático",
+    location:"Cesar School - Bloco A - Arquibancada",
+    speakers:[
+      {name:"Artur Sá",role:"CMO e Co-founder da Mesa",company:"Mesa"},
+      {name:"Teresa Alencar",role:"Staff Product Designer no Grupo Boticário",company:"Grupo Boticário",isClient:true},
+      {name:"Luciana De Mari",role:"Staff Designer no CESAR",company:"CESAR"}
+    ]
+  },
+  { id:"cf-f4fbe241", day:12, time:"15:20-16:20", client:"Petrobras", clients:["Petrobras"], clientTags:["Petrobras"],
+    offeredBy:"CESAR", format:"Debate",
+    title:"Além da Ideia: Intraempreendedorismo em Escala (100 em 5) nos Desafios Inovadores do Óleo e Gás",
     location:"Cesar School - Bloco C - Sala 111",
     speakers:[
-      {name:"Roberta Nunes Souza",role:"Coordenadora de Automacao e Digitalizacao",company:"Petrobras - RNEST",isClient:true},
-      {name:"Rodrigo Gandra",     role:"Gerente de computacao cientifica",          company:"Petrobras",       isClient:true},
-      {name:"Giselle Rossi",      role:"Design Manager",                            company:"CESAR",           isClient:false}
+      {name:"Giselle Rossi",role:"Design Manager",company:"CESAR"},
+      {name:"João Carrilho",role:"",company:""},
+      {name:"Roberta Nunes Souza",role:"Coordenadora de Automação e Digitalização",company:"Petrobras - Rnest",isClient:true},
+      {name:"Rodrigo Gandra",role:"Gerente computação cientifica",company:"Petrobras",isClient:true}
     ]
   },
-  { id:"act-11", day:12, time:"15:20-16:20", client:"Caixa",
-    title:"Comercio agentico no setor financeiro",
+  { id:"cf-d2498fe0", day:12, time:"15:20-16:20", client:"Caixa", clients:["Caixa"], clientTags:["Caixa"],
+    offeredBy:"CESAR", format:"Debate",
+    title:"Comércio agêntico no setor financeiro",
     location:"Cesar School - Bloco C - Sala 110",
     speakers:[
-      {name:"Renan Martino",          role:"Diretor",                    company:"Caixa",isClient:true},
-      {name:"Diego Tavares de Souza", role:"Principal Technical Manager", company:"CESAR",isClient:false}
+      {name:"Diego Tavares de Souza",role:"Principal Technical Manager",company:"CESAR"},
+      {name:"Daniel Bravo",role:"",company:""},
+      {name:"Renan Martino",role:"Diretor",company:"Caixa",isClient:true},
+      {name:"José Cláudio Filho",role:"",company:""}
     ]
   },
-  { id:"act-05", day:12, time:"16:40-17:40", client:"Baterias Moura / Grupo Moura",
+  { id:"cf-4d287514", day:12, time:"16:00-16:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Liderança e Inovação: Construindo o Futuro dos Negócios",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Bianca Furlanetto Galvao",role:"Gerente Geral",company:"Banco do Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-986e193d", day:12, time:"16:20-18:20", client:"Petrobras", clients:["Petrobras"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Petrobras", format:"Oficina",
+    title:"Estação Submersa - um jogo de decisões sob pressão",
+    location:"Cesar School - Bloco A - M001",
+    speakers:[
+      {name:"Adriana Barbosa Ferreira",role:"",company:""}
+    ]
+  },
+  { id:"cf-ae73d9ee", day:12, time:"16:40-17:40", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:["Baterias Moura"],
+    offeredBy:"TDS Company", format:"Debate",
     title:"The Frontier Moment",
-    location:"E.T.E. Porto Digital - Auditorio",
+    location:"E.T.E. Porto Digital - Auditório",
     speakers:[
-      {name:"Francisco Dias",        role:"Diretor de TI",                        company:"Grupo Moura",      isClient:true},
-      {name:"Silvio Meira",          role:"Fundador e Cientista Chefe",            company:"TDS Company",      isClient:false},
-      {name:"Adriana Salles Gomes",  role:"Jornalista e diretora-editorial",       company:"HSM Management",   isClient:false},
-      {name:"Francisco Gimenez",     role:"Gerente de Transformacao e Inovacao",   company:"Grupo 3Coracoes",  isClient:false}
+      {name:"Silvio Meira",role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School",company:""},
+      {name:"Adriana Salles Gomes",role:"Jornalista e diretora-editorial",company:"Hsm Management"},
+      {name:"Francisco Dias",role:"Diretor de TI",company:"Grupo Moura",isClient:true},
+      {name:"Francisco Gimenez",role:"Gerente de Transformação e Inovação",company:"Grupo 3Corações"}
     ]
   },
-  { id:"act-14", day:12, time:"18:00-19:00", client:"Real Hospital Portugues",
-    title:"Redes de dados em saude e sua utilizacao pelos setores publico e privado",
-    location:"Ti.Saude",
+  { id:"cf-780aea70", day:12, time:"17:00-17:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Blockchain além do Bitcoin: a tecnologia por trás de novas experiências digitais",
+    location:"Ponto BB - Palco BBDW",
     speakers:[
-      {name:"Joao Daniel Junqueira",             role:"Gerente Plataforma de Dados e Analytics",    company:"Real Hospital Portugues",isClient:true},
-      {name:"Severino Catao Rodrigues",          role:"Estatistico Sanitarista",                    company:"COSEMS-PE",              isClient:false},
-      {name:"Gustavo Sergio de Godoy Magalhaes", role:"Gerente Geral de Saude Digital",             company:"Prefeitura do Recife",   isClient:false},
-      {name:"Joselio Emar de Araujo Queiroz",    role:"Assessor Tecnico - Secretaria de Informacao e Saude Digital",company:"Ministerio da Saude",isClient:false}
+      {name:"Luciano Pereira da Silva",role:"",company:""}
     ]
   },
-
-  /* ===== DIA 13 ===== */
-  { id:"act-08", day:13, time:"10:00-11:00", client:"Bradesco",
-    title:"Dos Dados a Decisao: como transformar informacao em valor de negocio com confianca e escala",
-    location:"Moeda 50 - Auditorio Hall",
+  { id:"cf-843c3ab1", day:12, time:"18:00-19:00", client:"Real Hospital Português", clients:["Real Hospital Português"], clientTags:["Real Hospital Português"],
+    offeredBy:"Conselho de Secretarias Municipais de Saúde de Pernambuco (Cosems-pe)", format:"Debate",
+    title:"Redes de dados em saúde e sua utilização pelos setores público e privado",
+    location:"Ti.Saúde",
     speakers:[
-      {name:"Bruna Cecilia Pereira da Costa",role:"Data Science Tech Manager",        company:"Bradesco",isClient:true},
-      {name:"Rayza Wilma Melo de Souza",     role:"Data Engineer III",                company:"Bradesco",isClient:true},
-      {name:"Anne Kelly Ribeiro da Silva",   role:"Business Intelligence Analyst II", company:"Bradesco",isClient:true}
+      {name:"Severino Catão Rodrigues",role:"Estatístico Sanitarista",company:"COSEMS-PE"},
+      {name:"Gustavo Sérgio de Godoy Magalhães",role:"Gerente Geral de Saúde Digital do Recife",company:"Prefeitura do Recife (Saúde Digital)"},
+      {name:"João Daniel Junqueira",role:"Gerente Plataforma de Dados e Analytics",company:"Real Hospital Português",isClient:true},
+      {name:"Joselio Emar de Araujo Queiroz",role:"Assessor Técnico/ Secretaria de Informação e Saúde Digital",company:"Ministério da Saúde"}
     ]
   },
-  { id:"act-03", day:13, time:"10:00-11:30", client:"Globo",
-    title:"Quando a cidade fala, quem escuta?",
-    location:"Cais do Sertao - Auditorio E do Povo",
+  { id:"cf-d8232306", day:13, time:"08:00-17:00", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Baterias Moura", format:"Ativacao Rua",
+    title:"Test Ride Ella | Conheça a Bike Elétrica da Moura",
+    location:"Torre Malakoff",
     speakers:[
-      {name:"Caco Barcellos",role:"Jornalista e escritor",company:"Globo",        isClient:true},
-      {name:"Jota Ferreira",  role:"Comunicador popular", company:"",             isClient:false}
+      {name:"Bike Ella",role:"",company:""}
     ]
   },
-  { id:"act-16", day:13, time:"11:20-12:20", client:"Petrobras",
-    title:"Alem dos Algoritmos: Pessoas, Cultura e Habilidades na Adocao de IA em Softwares Criticos",
+  { id:"cf-47120744", day:13, time:"10:00-19:00", client:"Globo", clients:["Globo"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Globo", format:"Hackathon",
+    title:"Desafio Globo",
+    location:"Cesar School - Bloco B - Sala 202",
+    speakers:[]
+  },
+  { id:"cf-61e07f79", day:13, time:"10:00-11:00", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"CESAR", format:"Debate",
+    title:"Governança Ética de IA",
     location:"Cesar School - Bloco C - Sala 111",
     speakers:[
-      {name:"Felipe Marra",                   role:"Gerente de Inovacao em Servicos",         company:"Petrobras",        isClient:true},
-      {name:"Breno Garcia da Silva Alencar",  role:"Gerente de Desenvolvimento e Operacoes",  company:"CESAR",            isClient:false},
-      {name:"Eduardo Setton",                 role:"Cientista-Chefe e Fundador",               company:"iaryHealth/GPX.ai",isClient:false}
+      {name:"Roberta Fernandes",role:"",company:""},
+      {name:"Karla Godoy",role:"Ceo",company:"CESAR"},
+      {name:"Leonardo Kazuyoshi Benassi Uno",role:"Gerente Executivo",company:"Diretoria de Controles Internos do Banco do Brasil",isClient:true},
+      {name:"Priscilla Moraes",role:"Coordenadora do Capítulo Pernambuco do IBGE",company:""},
+      {name:"Antonio Goes",role:"",company:""}
     ]
   },
-  { id:"act-04", day:13, time:"17:00-18:15", client:"Globo",
-    title:"Brasil depois das urnas: o que as eleicoes de 2026 revelam sobre o pais?",
-    location:"Cais do Sertao - Auditorio E do Povo",
+  { id:"cf-16a3c27a", day:13, time:"10:00-19:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Gestão de Resíduos e Sustentabilidade",
+    location:"Boulevard Rio Branco",
+    speakers:[]
+  },
+  { id:"cf-7a81d8ae", day:13, time:"10:00-18:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Universo Fanta",
+    location:"Boulevard Rio Branco",
+    speakers:[]
+  },
+  { id:"cf-122b343e", day:13, time:"10:00-11:30", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Prefeitura do Recife, Ampla e Porto Digital", format:"Roda de Conversa",
+    title:"Quando a cidade fala, quem escuta?",
+    location:"Cais do Sertão - Auditório É do Povo",
     speakers:[
-      {name:"Gerson Camarotti", role:"Jornalista e comentarista politico",company:"GloboNews",  isClient:true},
-      {name:"Antonio Lavareda", role:"Presidente do Conselho Cientifico",  company:"IPESPE",     isClient:false},
-      {name:"Silvio Meira",     role:"Fundador e Cientista Chefe",         company:"TDS Company",isClient:false},
-      {name:"Marcelo Tokarski", role:"CEO",                                company:"Nexus",      isClient:false}
+      {name:"Caco Barcellos",role:"Jornalista e escritor",company:"",isClient:true},
+      {name:"Jota Ferreira",role:"Comunicador popular",company:""}
     ]
+  },
+  { id:"cf-e5a2e8de", day:13, time:"10:00-11:00", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"Moeda 50", format:"Roda de Conversa",
+    title:"Dos Dados à Decisão: como transformar informação em valor de negócio com confiança e escala",
+    location:"Moeda 50 - Auditório Hall",
+    speakers:[
+      {name:"Bruna Cecilia Pereira da Costa",role:"DATA SCIENCE TECH MANAGER",company:"Banco Bradesco S.A.",isClient:true},
+      {name:"Rayza Wilma Melo de Souza",role:"DATA ENGINEER III",company:"Banco Bradesco S.A.",isClient:true},
+      {name:"Anne Kelly Ribeiro da Silva",role:"BUSINESS INTELLIGENCE ANALYST II",company:"Banco Bradesco S.A.",isClient:true}
+    ]
+  },
+  { id:"cf-d2c06d3f", day:13, time:"10:00-11:00", client:"Google", clients:["Google"], clientTags:["Google"],
+    offeredBy:"CESAR", format:"Palestra",
+    title:"Acelerando a Adoção e o Impacto de IA no Google e Além",
+    location:"Cesar School - Bloco C - Sala 109",
+    speakers:[
+      {name:"Alex Freire",role:"Sr. Director Engineering, Site Lead SP, CISO Gpay BR",company:"Google",isClient:true}
+    ]
+  },
+  { id:"cf-d6bb326d", day:13, time:"10:00-10:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:["Banco do Brasil"],
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"O Dinheiro está mudando de mãos. Estamos percebendo?",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Maria Caroline Toson",role:"Líder de TI",company:"Banco do Brasil",isClient:true}
+    ]
+  },
+  { id:"cf-49c235c8", day:13, time:"11:00-11:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Quando a Conversa Vira Interface: Reinventando a Forma como Interagimos com a IA.",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Caio H Vilela de Carvalho",role:"Arquiteto de Soluções",company:"Capgemini"}
+    ]
+  },
+  { id:"cf-b0da8b7c", day:13, time:"11:20-12:20", client:"Petrobras", clients:["Petrobras"], clientTags:["Petrobras"],
+    offeredBy:"CESAR", format:"Debate",
+    title:"Além dos Algoritmos: Pessoas, Cultura e Habilidades na Adoção de IA em Softwares Críticos",
+    location:"Cesar School - Bloco C - Sala 111",
+    speakers:[
+      {name:"Breno Garcia da Silva Alencar",role:"Gerente de Desenvolvimento e Operações",company:"CESAR"},
+      {name:"Felipe Marra",role:"Gerente de Inovação em Serviços",company:"Petrobras",isClient:true},
+      {name:"Eduardo Setton",role:"Cientista-Chefe e Fundador",company:"iaryHealth/GPX.ai"},
+      {name:"Rodrigo Ferri",role:"",company:""}
+    ]
+  },
+  { id:"cf-42c73080", day:13, time:"11:20-12:05", client:"Petrobras", clients:["Petrobras"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Petrobrás", format:"Palestra",
+    title:"Do Débito Técnico à Inovação com IA: um case na Plataforma ServiceNow",
+    location:"Teatro Hermilo Borba Filho - Auditório",
+    speakers:[
+      {name:"Alexandre de Magalhães Dourado",role:"",company:""}
+    ]
+  },
+  { id:"cf-6e9463f4", day:13, time:"11:20-12:20", client:"Algar", clients:["Algar"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Algar", format:"Roda de Conversa",
+    title:"Quem paga a conta da comunidade?",
+    location:"Cesar School - Bloco C - Sala 109",
+    speakers:[
+      {name:"Aretusa Martins Teixeira",role:"Consultora",company:"Luv - Laboratório Urbano Vivo de Vitória"},
+      {name:"Mayara Pires",role:"Gerente de Comunidades da INOVABRA",company:""},
+      {name:"Lucas Santos da Silva Gomes",role:"Ceo",company:"Formiguero"},
+      {name:"Anderson Marcone da Silva Marinho",role:"Diretor Executivo",company:"CognitBuild"}
+    ]
+  },
+  { id:"cf-0bdb71b9", day:13, time:"12:40-13:40", client:"Bradesco", clients:["Bradesco"], clientTags:["Bradesco"],
+    offeredBy:"CESAR", format:"Debate",
+    title:"IA na prática: do potencial à transformação dos processos",
+    location:"Cesar School - Bloco C - Sala 111",
+    speakers:[
+      {name:"Lauro Elias",role:"",company:""},
+      {name:"Cicero Lopes Silva",role:"Partner (Head of Global Delivery Network Evolve at NTT DATA Brazil)",company:""},
+      {name:"Fábio Favaron",role:"Vp Honda Serviços Financeiros",company:""},
+      {name:"Wedell Barros",role:"Superintendente",company:"Bradesco Seguros",isClient:true}
+    ]
+  },
+  { id:"cf-2c69c748", day:13, time:"13:00-13:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Arqueologia de código: o que o mainframe lembra (e a gente esqueceu)",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Sandro Bertini",role:"",company:""}
+    ]
+  },
+  { id:"cf-f7ddcfe8", day:13, time:"14:00-15:15", client:"Google", clients:["Google"], clientTags:["Google"],
+    offeredBy:"Silvio Meira e Rosário Pompeia", format:"Debate",
+    title:"Da busca à recomendação: como sua marca será encontrada na era da IA?",
+    location:"Arena Pernambuco de Negócios - NERD Térreo - Auditório",
+    speakers:[
+      {name:"Rosário Pompéia",role:"Fundadora",company:"LeFil Company"},
+      {name:"Fátima Falcão",role:"Head de Indústria de Varejo (Commerce) do Google Brasil",company:"",isClient:true}
+    ]
+  },
+  { id:"cf-39cdf4d6", day:13, time:"14:00-14:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"Como a IA está transformando a Engenharia de Software?",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Paulo Borba",role:"CIn/UFPE, Centro de Informática, Universidade Federal de Pernambuco",company:""},
+      {name:"Rodrigo Bonifácio",role:"Professor do Ensino Superior",company:"Universidade Federal de Pernambuco"}
+    ]
+  },
+  { id:"cf-16860ed9", day:13, time:"14:00-14:45", client:"Petrobras", clients:["Petrobras"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Petrobras", format:"Palestra",
+    title:"Medindo do Alto: uso de drones na medição de produtos",
+    location:"Cesar School - Bloco C - Sala 110",
+    speakers:[
+      {name:"Earlyson Moreira Goncalves",role:"",company:""}
+    ]
+  },
+  { id:"cf-0ee267c3", day:13, time:"15:00-15:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Palestra",
+    title:"Ecossistema e crescimento de inovação no Brasil",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Ítalo Nogueira",role:"Presidente",company:"Aponti"}
+    ]
+  },
+  { id:"cf-d6263287", day:13, time:"16:00-16:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"Competências que transformam: Case Academias do Porto Digital",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Juliane Cristina da Silva Olímpio",role:"Analista de Rh Senior",company:"Deloitte"},
+      {name:"Helder Lins",role:"Head de TI da TTWORK",company:""},
+      {name:"Marcela Albuquerque",role:"Analista de Inovação",company:"Porto Digital"}
+    ]
+  },
+  { id:"cf-70371125", day:13, time:"16:40-17:25", client:"Petrobras", clients:["Petrobras"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Petrobras", format:"Palestra",
+    title:"Hackeando o excesso: Experiências que fazem sentido e viram memória",
+    location:"Livraria Jaqueira - Auditório",
+    speakers:[
+      {name:"Adriana Barbosa Ferreira",role:"",company:""}
+    ]
+  },
+  { id:"cf-3408d8c9", day:13, time:"16:40-17:25", client:"Petrobras", clients:["Petrobras"], clientTags:["Petrobras"],
+    offeredBy:"Petrobras", format:"Palestra",
+    title:"Manutenção Inteligente: uso de IA aplicada à manutenção",
+    location:"Moinho Recife - NTT DATA - Auditório",
+    speakers:[
+      {name:"Adailton Medeiros Rodrigues de Oliveira",role:"Engenheiro Eletrônico",company:"Petrobras",isClient:true}
+    ]
+  },
+  { id:"cf-d169e07c", day:13, time:"17:00-17:45", client:"Banco do Brasil", clients:["Banco do Brasil"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Banco do Brasil S.A", format:"Roda de Conversa",
+    title:"GovTech Inclusiva: Inteligência Artificial e Automação para Serviços Públicos Sem Barreiras / Do QI ao IQA: o que realmente importa na Era da Inteligência Artificial",
+    location:"Ponto BB - Palco BBDW",
+    speakers:[
+      {name:"Tatiana Braga",role:"",company:""},
+      {name:"Tarciana Katter",role:"",company:""},
+      {name:"Virginia Chalegre",role:"Ceo da t-access",company:"T-access"}
+    ]
+  },
+  { id:"cf-1290f205", day:13, time:"17:00-18:15", client:"Globo", clients:["Globo"], clientTags:["Globo"],
+    offeredBy:"Silvio Meira e Rosário Pompeia", format:"Debate",
+    title:"Brasil depois das urnas: o que as eleições de 2026 revelam sobre o país?",
+    location:"Cais do Sertão - Auditório É do Povo",
+    speakers:[
+      {name:"Antonio Lavareda",role:"Presidente do Conselho Científico",company:"IPESPE"},
+      {name:"Silvio Meira",role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School",company:""},
+      {name:"Gerson Camarotti",role:"Jornalista, escritor e comentarista político",company:"",isClient:true},
+      {name:"Rosário Pompéia",role:"Fundadora",company:"LeFil Company"},
+      {name:"Marcelo Tokarski",role:"CEO da Nexus – Pesquisa e Inteligência de Dados",company:"Sócio-diretor da FSB Holding."}
+    ]
+  },
+  { id:"cf-53a374c6", day:14, time:"08:00-17:00", client:"Baterias Moura", clients:["Baterias Moura"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Baterias Moura", format:"Ativacao Rua",
+    title:"Test Ride Ella | Conheça a Bike Elétrica da Moura",
+    location:"Torre Malakoff",
+    speakers:[
+      {name:"Bike Ella",role:"",company:""}
+    ]
+  },
+  { id:"cf-75bf2f68", day:14, time:"10:00-19:00", client:"Globo", clients:["Globo"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Globo", format:"Hackathon",
+    title:"Desafio Globo",
+    location:"Cesar School - Bloco B - Sala 202",
+    speakers:[]
+  },
+  { id:"cf-f9630c49", day:14, time:"10:00-19:00", client:"Solar Coca-Cola", clients:["Solar Coca-Cola"], clientTags:[], isOfferedBy:true,
+    offeredBy:"Solar Coca-Cola", format:"Ativacao Rua",
+    title:"Gestão de Resíduos e Sustentabilidade",
+    location:"Boulevard Rio Branco",
+    speakers:[]
   }
 ];
 
-let currentDay = 11;
+let currentDay = "all";
 
 function renderCard(act){
   const clientSpk = act.speakers.filter(s=>s.isClient);
@@ -1005,13 +1972,10 @@ function renderCard(act){
     `<div class="av" style="background:${avatarColor(s.name)}">${initials(s.name)}</div>`
   ).join("")+(extra>0?`<div class="av av-extra">+${extra}</div>`:"");
 
-  const speakerNames = clientSpk.length
-    ? clientSpk.map(s=>s.name).join(", ")
-    : (act.speakers[0]?.name||"");
-
   const isOffered = !!act.isOfferedBy;
+  const offeredNames = joinNames(act.clients || [act.client]);
   const tagBadge  = isOffered
-    ? `<span class="tag tag-oferecida">Oferecida por ${esc(act.client)}</span>`
+    ? `<span class="tag tag-oferecida">Oferecida por ${esc(offeredNames)}</span>`
     : `<span class="tag tag-clientes">Clientes pelo Fest</span>`;
 
   return `
@@ -1023,47 +1987,48 @@ function renderCard(act){
         </div>
         <span class="ms" style="color:var(--text-400);font-size:18px">chevron_right</span>
       </div>
-      <div class="avatars">${avHtml}</div>
+      ${ordered.length ? `<div class="avatars">${avHtml}</div>` : ""}
       <h3 class="card-title">${esc(act.title)}</h3>
       <div class="card-meta">
-        <div class="meta-row">
+        ${ordered.length ? `<div class="meta-row">
           <span class="ms ms-16">person</span>
-          <span>${esc(speakerNames)}</span>
-        </div>
+          <span class="meta-spk" title="${esc(spkTitle(ordered))}">${esc(spkLine(ordered))}</span>
+        </div>` : ""}
         <div class="meta-row">
           <span class="ms ms-16">location_on</span>
           <span>${esc(act.location)}</span>
         </div>
       </div>
       <div class="card-tags">
-        <span class="tag tag-cat">${esc(act.client)}</span>
+        ${clientTagsHtml(act) || (isOffered ? "" : `<span class="tag tag-cat">${esc(act.client)}</span>`)}
         ${tagBadge}
       </div>
     </div>`;
 }
 
 function renderDay(day){
-  const list      = activities.filter(a=>a.day===day);
+  const cli       = filtroCliente.cf;
+  const list      = dayList(activities,day,cli);
   const container = document.getElementById("cards-container");
   const label     = document.getElementById("count-label");
   if(!list.length){
     label.textContent="";
-    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Nao ha atividades de clientes<br>registradas para este dia.</p></div>`;
+    container.innerHTML=emptyHtml(cli, "Não há atividades de clientes<br>registradas para este dia.", "cf");
     return;
   }
-  label.textContent=`${list.length} atividade${list.length>1?"s":""}`;
-  container.innerHTML=list.map(renderCard).join("");
+  label.textContent=`${list.length} atividade${list.length>1?"s":""}${cli?" · "+cli:""}`;
+  container.innerHTML=cardsHtml(list,day,renderCard);
 }
 
 function setDay(day){
   currentDay=day;
   document.querySelectorAll("#day-filter .day-chip").forEach(el=>{
-    el.classList.toggle("active",parseInt(el.dataset.day)===day);
+    el.classList.toggle("active",chipDay(el)===day);
   });
   renderDay(day);
 }
 document.querySelectorAll("#day-filter .day-chip").forEach(el=>{
-  el.addEventListener("click",()=>setDay(parseInt(el.dataset.day)));
+  el.addEventListener("click",()=>setDay(chipDay(el)));
 });
 
 
@@ -1099,10 +2064,10 @@ function showDetail(id,backLabel){
     catTag = act.format ? `<span class="tag tag-cat">${esc(act.format)}</span>` : "";
     badge  = `<span class="tag tag-fomos">Fomos Convidados</span>`;
   } else {
-    catTag = act.client ? `<span class="tag tag-cat">${esc(act.client)}</span>` : "";
     const isOffered = !!act.isOfferedBy;
+    catTag = (!isOffered && act.client) ? `<span class="tag tag-cat">${esc(act.client)}</span>` : "";
     badge  = isOffered
-      ? `<span class="tag tag-oferecida">Oferecida por ${esc(act.isOfferedBy)}</span>`
+      ? `<span class="tag tag-oferecida">Oferecida por ${esc(joinNames(act.clients || [act.client]))}</span>`
       : `<span class="tag tag-clientes">Clientes pelo Fest</span>`;
   }
 
@@ -1117,14 +2082,14 @@ function showDetail(id,backLabel){
     </div>`).join("");
 
   document.getElementById("detail-content").innerHTML=`
-    <div class="detail-tags">${catTag}${badge}</div>
+    <div class="detail-tags">${clientTagsHtml(act)}${clientTagsHtml(act) && act.client ? "" : catTag}${badge}</div>
     <div class="detail-time-block">
       <div class="detail-time-str">${esc(act.time)}</div>
       <div class="detail-date-str">${DAYS_PT[act.day]||act.day+" nov"}</div>
     </div>
     <h2 class="detail-title">${esc(act.title)}</h2>
-    <div class="detail-section-lbl">Palestrantes</div>
-    <div class="detail-speakers">${spkHtml}</div>
+    ${act.speakers.length ? `<div class="detail-section-lbl">Palestrantes</div>
+    <div class="detail-speakers">${spkHtml}</div>` : ""}
     <div class="detail-section-lbl">Espaço</div>
     <div class="detail-loc"><span class="ms ms-24">location_on</span><span>${esc(act.location||"Accenture Innovation Center - Auditório")}</span></div>`;
 
@@ -1146,51 +2111,51 @@ function hideDetail(){
 }
 
 /* ================================================================
-   SUBMISSOES ACCENTURE — 28 atividades confirmadas
-   Fonte: RecNPlay_2026_Atividades_Accenture.txt  |  05/11/2026
-   Excluídos: act-02, act-13 (NÃO LOCALIZADAS).
+   SUBMISSOES ACCENTURE — 29 atividades
+   Fonte: RecNPlay_2026_Atividades_Accenture.txt  |  revisão 3 — 10/11/2026 (conferida com a agenda oficial)
    Speakers sem cargo: Levi Florencio, Joselyto Riani, Matheus Hopper.
-   Pendências: act-17 (conflito horário), act-14 (ausente no PDF Sinergia).
+   Obs.: sub-21 (Loop Engineering) tem horário/local próprios na agenda oficial, fora do bloco Sinergia.
+   Pendências: cargo de Leonardo Alves (CiTI) a confirmar.
    ================================================================ */
 const submissoesActivities = [
 
   /* ===== DIA 11 ===== */
-  { id:"sub-13", day:11, time:"09:00", isSinergia:false,
-    title:"Qiskit Fall Fest: uma experiencia imersiva em computacao quantica",
-    location:"Accenture Innovation Center - Auditorio",
+  { id:"sub-13", day:11, time:"09:00-13:00", isSinergia:false,
+    title:"Qiskit Fall Fest: uma experiência imersiva em computação quântica",
+    location:"Accenture Innovation Center - Auditório",
     speakers:[
-      {name:"Yara Rodrigues",             role:"Innovation Researcher",                              company:"Accenture do Brasil"},
-      {name:"Saulo Cadete Santos Machado",role:"Gerente Senior de Inovacao",                        company:"Accenture do Brasil"},
-      {name:"Gustavo Botelho",            role:"PhD em Ciencia da Computacao e IA/Analise de dados",company:"Banco do Brasil"},
+      {name:"Yara Rodrigues",             role:"Innovation Research Analyst",                            company:"Accenture do Brasil"},
+      {name:"Saulo Cadete Santos Machado",role:"Gerente Sênior de Inovação",                        company:"Accenture do Brasil"},
+      {name:"Gustavo Botelho",            role:"PhD em Ciência da Computação e IA/Análise de dados",company:"Banco do Brasil"},
       {name:"Erico Teixeira",             role:"Researcher in Quantum Computing",                   company:"Venturus"}
     ]
   },
   { id:"sub-15", day:11, time:"10:00-10:50", isSinergia:true,
-    title:"Reinventar nao e recomecar do zero",
+    title:"Reinventar não é recomeçar do zero",
     location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Carolina Giammarino Camacho",role:"UX Designer Senior",company:"Accenture"}]
+    speakers:[{name:"Carolina Giammarino Camacho",role:"UX Designer Sênior",company:"Accenture"}]
   },
   { id:"sub-16", day:11, time:"11:10-12:00", isSinergia:true,
-    title:"Sem Barreiras: Inclusao que transforma vidas, carreiras e empresas",
+    title:"Sem Barreiras: Inclusão que transforma vidas, carreiras e empresas",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
-      {name:"Lisiane Thais Neri",   role:"Gerente Senior (Sr Manager)",company:"Accenture"},
-      {name:"Leticia Lopes",        role:"Senior Campus Recruiter",    company:"Accenture"}
+      {name:"Lisiane Thais Neri",   role:"Gerente Sênior (Sr Manager)",company:"Accenture"},
+      {name:"Letícia Lopes",        role:"Senior Campus Recruiter",    company:"Accenture"}
     ]
   },
-  { id:"sub-03", day:11, time:"11:20-12:20", isSinergia:false,
-    title:"Da sustentacao a operacao: a jornada da LDC para conectar Shared Business Services, TI e negocio atraves do ORT",
-    location:"Ti.Saude",
+  { id:"sub-03", day:12, time:"11:20-12:20", isSinergia:false,
+    title:"Da sustentação à operação: a jornada da LDC para conectar Shared Business Services, TI e negócio através do ORT",
+    location:"Ti.Saúde",
     speakers:[
       {name:"Marilyn Silva",   role:"Service Manager BackOffice Projects & Regional Ams",company:"LDC"},
       {name:"Juliana Almeida", role:"Ams Delivery Lead",                                 company:"Accenture"}
     ]
   },
   { id:"sub-12", day:11, time:"14:00-15:00", isSinergia:false,
-    title:"Ipiranga + IA: os bastidores de uma transformacao analitica em escala real",
-    location:"Accenture Innovation Center - Auditorio",
+    title:"Ipiranga + IA: os bastidores de uma transformação analítica em escala real",
+    location:"Accenture Innovation Center - Auditório",
     speakers:[
-      {name:"Sergio Luiz Coutinho Ferreira",    role:"Gerente Senior",                              company:"Accenture"},
+      {name:"Sergio Luiz Coutinho Ferreira",    role:"Gerente Sênior",                              company:"Accenture"},
       {name:"Angela Kai",                        role:"Head de Dados, IA e Arquitetura Corporativa", company:"Ipiranga"},
       {name:"Sergio Alexandre Naime Mantovani",  role:"Associate Director",                          company:"Accenture"}
     ]
@@ -1200,32 +2165,32 @@ const submissoesActivities = [
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
       {name:"Gabriella dos Santos Freitas",          role:"UX Designer",  company:"Accenture"},
-      {name:"Alvaro Gabriel Silva Nascimento",        role:"Desenvolvedor",company:"Accenture"}
+      {name:"Álvaro Gabriel Silva Nascimento",        role:"Desenvolvedor",company:"Accenture"}
     ]
   },
   { id:"sub-18", day:11, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Ontem, hoje e amanha: Como se transformar em um mundo que muda toda semana?",
+    title:"Ontem, hoje e amanhã: Como se transformar em um mundo que muda toda semana?",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
       {name:"Caio Matheus Nazario Lopes",             role:"UX Designer",          company:"Accenture"},
       {name:"Mateus Germoglio",                       role:"Consultor e Team Lead de UX Design",company:"Accenture"},
-      {name:"Marcos Kaio Belarmino Santana",          role:"Head de Desenvolvimento",company:"CiTI / UFPE"},
+      {name:"Marcos Kaiô Belarmino Santana",          role:"Head de Desenvolvimento",company:"CiTI / UFPE"},
       {name:"Leonardo Alves Cavalcanti de Oliveira",  role:"Head de Desenvolvimento",company:"CiTI / UFPE"}
     ]
   },
   { id:"sub-19", day:11, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Do Corel a IA: ferramentas mudam. Bons designers evoluem",
+    title:"Do Corel à IA: ferramentas mudam. Bons designers evoluem",
     location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Carolina Giammarino Camacho",role:"UX Designer Senior",company:"Accenture"}]
+    speakers:[{name:"Carolina Giammarino Camacho",role:"UX Designer Sênior",company:"Accenture"}]
   },
   { id:"sub-20", day:11, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Game UX: Do Tabuleiro as Telas (e de volta ao tabuleiro)",
+    title:"Game UX: Do Tabuleiro às Telas (e de volta ao tabuleiro)",
     location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Lucas Coutinho Ponciano",role:"UX Designer Senior",company:"Accenture"}]
+    speakers:[{name:"Lucas Coutinho Ponciano",role:"UX Designer Sênior",company:"Accenture"}]
   },
   { id:"sub-01", day:11, time:"18:00-19:00", isSinergia:false,
-    title:"Accenture SAP Domains: Comunidade, Valor e a Reinvencao dos Projetos SAP",
-    location:"Accenture Innovation Center - Auditorio",
+    title:"Accenture SAP Domains: Comunidade, Valor e a Reinvenção dos Projetos SAP",
+    location:"Accenture Innovation Center - Auditório",
     speakers:[
       {name:"Carla Warick",  role:"Delivery Lead Assoc Director",company:"Accenture"},
       {name:"Oscar Santos",  role:"Diretor de Tecnologia",       company:"Accenture do Brasil"}
@@ -1233,77 +2198,77 @@ const submissoesActivities = [
   },
 
   /* ===== DIA 12 ===== */
-  { id:"sub-21", day:12, time:"Bloco 10h-12h", isSinergia:true,
-    title:"Loop Engineering: Orquestrando Squads Agenticas Autonomas (ou quase)",
-    location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Osvaldo Ferreira Alves",role:"Group Manager / Enterprise Technology Architect",company:"Avanade"}]
+  { id:"sub-21", day:12, time:"16:40-17:40", isSinergia:true,
+    title:"Loop Engineering: Orquestrando Squads Agênticas Autônomas (ou quase)",
+    location:"Cesar School - Bloco A - Arquibancada",
+    speakers:[{name:"Osvaldo Ferreira Alves",role:"Gerente Sênior",company:"Avanade"}]
   },
   { id:"sub-22", day:12, time:"Bloco 10h-12h", isSinergia:true,
-    title:"Todo prompt grande e uma arquitetura pedindo para ser descoberta",
+    title:"Todo prompt grande é uma arquitetura pedindo para ser descoberta",
     location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Fabio Bergamini Leonardo",role:"Gerente Executivo de Inovacao",company:"Accenture"}]
+    speakers:[{name:"Fabio Bergamini Leonardo",role:"Gerente Executivo de Inovação",company:"Accenture"}]
   },
   { id:"sub-08", day:12, time:"11:20-12:05", isSinergia:false,
-    title:"O Agile morreu? Por que o V-Model e a forma natural de programar com IA",
-    location:"Secretaria da Mulher de Pernambuco - Auditorio",
-    speakers:[{name:"Paulo Victor de Sousa Moura",role:"Principal de Inovacao e Tecnologias Emergentes",company:"Accenture"}]
+    title:"O Agile morreu? Por que o V-Model é a forma natural de programar com IA",
+    location:"Secretaria da Mulher de Pernambuco - Auditório",
+    speakers:[{name:"Paulo Victor de Sousa Moura",role:"Principal de Inovação e Tecnologias Emergentes",company:"Accenture"}]
   },
   { id:"sub-14", day:12, time:"15:20-16:20", isSinergia:false,
-    title:"O lado humano da transformacao digital: por que a tecnologia nao e o maior desafio?",
-    location:"Livraria Jaqueira",
+    title:"O lado humano da transformação digital: porque a tecnologia não é o maior desafio?",
+    location:"Livraria Jaqueira - Auditório",
     speakers:[
       {name:"Noemi Rodrigues",role:"Technology Associate Director",company:"Accenture"},
-      {name:"Edilson Reis",   role:"CIO | Digital, Dados, IA, Inovacao e Customer Experience",company:"Bradesco Seguros",isClient:true}
+      {name:"Edilson Reis",   role:"CIO | Digital, Dados, IA, Inovação e Customer Experience",company:"Bradesco Seguros",isClient:true}
     ]
   },
-  { id:"sub-23", day:12, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Natura: como acontece a criacao de Produtos com Tecnologias Disruptivas",
+  { id:"sub-23", day:12, time:"14:00-14:50", isSinergia:true,
+    title:"Natura: como acontece a criação de Produtos com Tecnologias Disruptivas",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
-      {name:"Artur Placeres Neto",role:"Gerente Cientifico Senior em Ciencia de Fragrancias",company:"Natura"},
-      {name:"Carla Nascimento",   role:"Gerente de Inovacao em Design e Experiencia do Cliente",company:"Accenture"}
+      {name:"Artur Placeres Neto",role:"Gerente Científico Sênior em Ciência de Fragrâncias",company:"Natura"},
+      {name:"Carla Nascimento",   role:"Gerente de Inovação em Design e Experiência do Cliente",company:"Accenture"}
     ]
   },
   { id:"sub-24", day:12, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Do SAS a IA: A Evolucao da Plataforma de Dados para Geracao de Valor",
+    title:"Do SAS à IA: A Evolução da Plataforma de Dados para Geração de Valor",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[{name:"Marcos de Freitas",role:"Associate Director",company:"Accenture"}]
   },
   { id:"sub-25", day:12, time:"Bloco 14h-18h", isSinergia:true,
     title:"Level Up: O Jogo da Carreira",
     location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Barbara Borges",role:"Lider e Especialista em Agilidade",company:""}]
+    speakers:[{name:"Bárbara Borges",role:"Líder e Especialista em Agilidade",company:""}]
   },
   { id:"sub-04", day:12, time:"15:20-16:20", isSinergia:false,
-    title:"Como IA Generativa e Agentes estao reinventando a Engenharia de Qualidade",
+    title:"Como IA Generativa e Agentes estão reinventando a Engenharia de Qualidade",
     location:"Cesar School - Bloco C - Sala 109",
     speakers:[
-      {name:"Lais Paschoal Leal", role:"Quality Engineering Associate Manager",company:"Accenture"},
+      {name:"Laís Paschoal Leal", role:"Quality Engineering Associate Manager",company:"Accenture"},
       {name:"Maycon Costa",       role:"Test Automation Eng Associate Manager", company:"Accenture"},
       {name:"Rodrigo Nascimento",  role:"Gerente",                               company:"Accenture"}
     ]
   },
   { id:"sub-10", day:12, time:"15:20-16:20", isSinergia:false,
-    title:"O Futuro do SAP Ja Comecou: Inteligencia Artificial na Pratica",
+    title:"O Futuro do SAP Já Começou: Inteligência Artificial na Prática",
     location:"Cesar School - Bloco B - Sala 001 e 002",
     speakers:[
-      {name:"Saulo Cadete Santos Machado",role:"Gerente Senior de Inovacao",company:"Accenture do Brasil"},
-      {name:"Fernando Costa",             role:"Gerente Senior",             company:"Accenture do Brasil"},
-      {name:"Daniel Gonzalez",            role:"Diretor de Inovacao",        company:"Accenture"}
+      {name:"Daniel Gonzalez",            role:"Diretor de Inovação",        company:"Accenture"},
+      {name:"Fernando Costa",             role:"Gerente Sênior",             company:"Accenture do Brasil"},
+      {name:"João Otto Gethmann",         role:"Business Architecture Associate Director",company:"Accenture"}
     ]
   },
   { id:"sub-11", day:12, time:"17:00-18:40", isSinergia:false,
-    title:"Bob for Q: IA Generativa acelerando desenvolvimento de Computacao Quantica",
+    title:"Bob for Q: IA Generativa acelerando desenvolvimento de Computação Quântica",
     location:"UNIAESO - LAB",
     speakers:[
-      {name:"Saulo Cadete Santos Machado",role:"Gerente Senior de Inovacao",                    company:"Accenture do Brasil"},
-      {name:"Sergio Gama",                role:"Principal AI Solution Architect para a America Latina",company:"TD SYNNEX"}
+      {name:"Saulo Cadete Santos Machado",role:"Gerente Sênior de Inovação",                    company:"Accenture do Brasil"},
+      {name:"Sergio Gama",                role:"Principal AI Solution Architect para a América Latina",company:"TD SYNNEX"}
     ]
   },
 
   /* ===== DIA 13 ===== */
   { id:"sub-26", day:13, time:"Bloco 10h-12h", isSinergia:true,
-    title:"Oficina educacional de Interacao Humano-Robo",
+    title:"Oficina educacional de Interação Humano-Robô",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
       {name:"Priscila Gomes Machado", role:"UX/UI Designer",                  company:"Accenture"},
@@ -1312,51 +2277,52 @@ const submissoesActivities = [
     ]
   },
   { id:"sub-27", day:13, time:"Bloco 10h-12h", isSinergia:true,
-    title:"Liderando o caos: gestao de projetos de Transformacao em ambientes de incerteza",
+    title:"Liderando o caos: gestão de projetos de Transformação em ambientes de incerteza",
     location:"Accenture Innovation Center - Arena Marco Zero",
-    speakers:[{name:"Noemi Carignati Rodrigues Modernel",role:"Lider",company:"Accenture"}]
+    speakers:[{name:"Noemi Carignati Rodrigues Modernel",role:"Líder",company:"Accenture"}]
   },
   { id:"sub-05", day:13, time:"11:20-12:05", isSinergia:false,
-    title:"Arquitetura Corporativa, impacto da IA e cenario geo-estrategico",
+    title:"Arquitetura Corporativa, impacto da IA e cenário geo-estratégico",
     location:"Cesar School - Bloco B - Sala 001 e 002",
-    speakers:[{name:"Marcelo F Cabrera",role:"Senior Manager / Engenheiro da Computacao",company:"Accenture do Brasil Ltda"}]
+    speakers:[{name:"Marcelo F Cabrera",role:"Senior Manager / Engenheiro da Computação",company:"Accenture do Brasil Ltda"}]
   },
   { id:"sub-09", day:13, time:"13:20-14:20", isSinergia:false,
-    title:"Voce entregou tudo e o cliente ainda nao ficou satisfeito. Por que?",
+    title:"Você entregou tudo e o cliente ainda não ficou satisfeito. Por quê?",
     location:"Arte Plural Galeria",
     speakers:[
       {name:"Rayanne Ribeiro",role:"Consultora",          company:"Accenture"},
       {name:"Marcos Freitas", role:"Associate Director",  company:"Accenture"},
       {name:"Levi Souza",     role:"Data & AI Associate Manager",company:"Accenture"},
-      {name:"Sergio Prazin",  role:"Gerente",             company:"Accenture"}
+      {name:"Sergio Prazin",  role:"Gerente",             company:"Accenture"},
+      {name:"Matheus Hopper", role:"",                   company:""}
     ]
   },
   { id:"sub-07", day:13, time:"14:00-15:00", isSinergia:false,
-    title:"IA no coracao do dinheiro: como a IA esta redesenhando a industria financeira",
-    location:"Accenture Innovation Center - Auditorio",
+    title:"IA no coração do dinheiro: como a IA está redesenhando a indústria financeira",
+    location:"Accenture Innovation Center - Auditório",
     speakers:[
       {name:"Noemi Rodrigues Modernel",role:"Technology Associate Director",          company:"Accenture"},
-      {name:"Mauricio Barbosa",         role:"Lider de Servicos Financeiros p/ LATAM", company:"Accenture"},
+      {name:"Mauricio Barbosa",         role:"Lead Managing Director",company:"Accenture"},
       {name:"Daniel de Amaral",         role:"Managing Director",                      company:"Accenture"}
     ]
   },
   { id:"sub-28", day:13, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Reconhecendo golpes de IA: oficina de defesa digital para o publico idoso",
+    title:"Reconhecendo golpes de IA: oficina de defesa digital para o público idoso",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[{name:"Gustavo Henrique de Araujo Rodrigues",role:"UX Designer",company:"Accenture"}]
   },
   { id:"sub-29", day:13, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Jogo da Consciencia - toda escolha importa",
+    title:"Jogo da Consciência - toda escolha importa",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
       {name:"Alyne Leal Limeira",         role:"Designer",                           company:"Accenture"},
-      {name:"Saulo Cadete Santos Machado", role:"Gerente Senior",                     company:"Accenture"},
-      {name:"Bruno Aguiar de Oliveira",    role:"Lider de Engenharia e Inovacao",     company:"Accenture"},
+      {name:"Saulo Cadete Santos Machado", role:"Gerente Sênior",                     company:"Accenture"},
+      {name:"Bruno Aguiar de Oliveira",    role:"Líder de Engenharia e Inovação",     company:"Accenture"},
       {name:"Ericka Pricila da Silva",     role:"Tech Innovation Eng. Analyst",       company:"Accenture"}
     ]
   },
   { id:"sub-30", day:13, time:"Bloco 14h-18h", isSinergia:true,
-    title:"Entre usar e confiar: investigando a experiencia do usuario com bots e IA generativa",
+    title:"Entre usar e confiar: investigando a experiência do usuário com bots e IA generativa",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
       {name:"Caio Matheus Nazario Lopes",   role:"UX Designer",             company:"Accenture"},
@@ -1365,7 +2331,7 @@ const submissoesActivities = [
   },
   { id:"sub-06", day:13, time:"15:20-16:20", isSinergia:false,
     title:"Databricks e Lakehouse: A Arquitetura que Unifica Dados e IA",
-    location:"Livraria Jaqueira - Auditorio",
+    location:"Livraria Jaqueira - Auditório",
     speakers:[
       {name:"Marcos Freitas",  role:"Associate Director",company:"Accenture"},
       {name:"Ygor Goldberg",   role:"Data Engineer",     company:"Accenture"},
@@ -1381,7 +2347,7 @@ const activityMap = {};
 [...activities, ...submissoesActivities].forEach(a => activityMap[a.id] = a);
 
 /* Submissoes screen controller */
-let currentDayS = 11;
+let currentDayS = "all";
 
 function renderCardS(act){
   const show  = act.speakers.slice(0,3);
@@ -1408,66 +2374,66 @@ function renderCardS(act){
       <div class="card-meta">
         <div class="meta-row">
           <span class="ms ms-16">person</span>
-          <span>${esc(act.speakers[0]?.name||"")}</span>
+          <span class="meta-spk" title="${esc(spkTitle(act.speakers))}">${esc(spkLine(act.speakers))}</span>
         </div>
         <div class="meta-row">
           <span class="ms ms-16">location_on</span>
           <span>${esc(act.location)}</span>
         </div>
       </div>
-      <div class="card-tags">${badge2}</div>
+      <div class="card-tags">${clientTagsHtml(act)}${badge2}</div>
     </div>`;
 }
 
 function renderDayS(day){
-  const list      = submissoesActivities.filter(a=>a.day===day);
+  const list      = dayList(submissoesActivities,day);
   const container = document.getElementById("cards-container-s");
   const label     = document.getElementById("count-label-s");
   if(!list.length){
     label.textContent="";
-    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Nao ha atividades Accenture<br>registradas para este dia.</p></div>`;
+    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Não há atividades Accenture<br>registradas para este dia.</p></div>`;
     return;
   }
   label.textContent=`${list.length} atividade${list.length>1?"s":""}`;
-  container.innerHTML=list.map(renderCardS).join("");
+  container.innerHTML=cardsHtml(list,day,renderCardS);
 }
 
 function setDayS(day){
   currentDayS=day;
   document.querySelectorAll("#day-filter-s .day-chip").forEach(el=>{
-    el.classList.toggle("active",parseInt(el.dataset.day)===day);
+    el.classList.toggle("active",chipDay(el)===day);
   });
   renderDayS(day);
 }
 document.querySelectorAll("#day-filter-s .day-chip").forEach(el=>{
-  el.addEventListener("click",()=>setDayS(parseInt(el.dataset.day)));
+  el.addEventListener("click",()=>setDayS(chipDay(el)));
 });
 
-setDay(11);
+setDay("all");
 
 /* ================================================================
    COM CLIENTES — 5 atividades com clientes convidados
-   Fonte: RecNPlay_2026_Accenture_Convida_Cliente.txt  |  05/11/2026
+   Fonte: RecNPlay_2026_Accenture_Convida_Cliente.txt  |  atualizado em 10/11/2026
    Clientes: Banco do Brasil, Ipiranga, LDC, Natura, Bradesco
    ================================================================ */
 const convidaActivities = [
 
   /* ===== DIA 11 ===== */
-  { id:"conv-13", day:11, time:"09:00", client:"Banco do Brasil",
-    title:"Qiskit Fall Fest: uma experiencia imersiva em computacao quantica",
-    location:"Accenture Innovation Center - Auditorio",
+  { id:"conv-13", day:11, time:"09:00-13:00", client:"Banco do Brasil",
+    title:"Qiskit Fall Fest: uma experiência imersiva em computação quântica",
+    location:"Accenture Innovation Center - Auditório",
     speakers:[
-      {name:"Yara Rodrigues",             role:"Innovation Researcher",                              company:"Accenture do Brasil"},
-      {name:"Saulo Cadete Santos Machado",role:"Gerente Senior de Inovacao",                        company:"Accenture do Brasil"},
-      {name:"Gustavo Botelho",            role:"PhD em Ciencia da Computacao e IA/Analise de dados",company:"Banco do Brasil",isClient:true},
+      {name:"Yara Rodrigues",             role:"Innovation Research Analyst",                            company:"Accenture do Brasil"},
+      {name:"Saulo Cadete Santos Machado",role:"Gerente Sênior de Inovação",                        company:"Accenture do Brasil"},
+      {name:"Gustavo Botelho",            role:"PhD em Ciência da Computação e IA/Análise de dados",company:"Banco do Brasil",isClient:true},
       {name:"Erico Teixeira",             role:"Researcher in Quantum Computing",                   company:"Venturus"}
     ]
   },
   { id:"conv-12", day:11, time:"14:00-15:00", client:"Ipiranga",
-    title:"Ipiranga + IA: os bastidores de uma transformacao analitica em escala real",
-    location:"Accenture Innovation Center - Auditorio",
+    title:"Ipiranga + IA: os bastidores de uma transformação analítica em escala real",
+    location:"Accenture Innovation Center - Auditório",
     speakers:[
-      {name:"Sergio Luiz Coutinho Ferreira",    role:"Gerente Senior",                              company:"Accenture"},
+      {name:"Sergio Luiz Coutinho Ferreira",    role:"Gerente Sênior",                              company:"Accenture"},
       {name:"Angela Kai",                        role:"Head de Dados, IA e Arquitetura Corporativa", company:"Ipiranga",isClient:true},
       {name:"Sergio Alexandre Naime Mantovani",  role:"Associate Director",                          company:"Accenture"}
     ]
@@ -1475,27 +2441,27 @@ const convidaActivities = [
 
   /* ===== DIA 12 ===== */
   { id:"conv-03", day:12, time:"11:20-12:20", client:"LDC",
-    title:"Da sustentacao a operacao: a jornada da LDC para conectar Shared Business Services, TI e negocio atraves do ORT",
-    location:"Ti.Saude",
+    title:"Da sustentação à operação: a jornada da LDC para conectar Shared Business Services, TI e negócio através do ORT",
+    location:"Ti.Saúde",
     speakers:[
       {name:"Marilyn Silva",   role:"Service Manager BackOffice Projects & Regional Ams",company:"LDC",isClient:true},
       {name:"Juliana Almeida", role:"Ams Delivery Lead",                                 company:"Accenture"}
     ]
   },
-  { id:"conv-23", day:12, time:"Bloco 14h-18h", client:"Natura",
-    title:"Natura: como acontece a criacao de Produtos com Tecnologias Disruptivas",
+  { id:"conv-23", day:12, time:"14:00-14:50", client:"Natura",
+    title:"Natura: como acontece a criação de Produtos com Tecnologias Disruptivas",
     location:"Accenture Innovation Center - Arena Marco Zero",
     speakers:[
-      {name:"Artur Placeres Neto",role:"Gerente Cientifico Senior em Ciencia de Fragrancias",company:"Natura",isClient:true},
-      {name:"Carla Nascimento",    role:"Gerente de Inovacao em Design e Experiencia do Cliente",company:"Accenture"}
+      {name:"Artur Placeres Neto",role:"Gerente Científico Sênior em Ciência de Fragrâncias",company:"Natura",isClient:true},
+      {name:"Carla Nascimento",    role:"Gerente de Inovação em Design e Experiência do Cliente",company:"Accenture"}
     ]
   },
   { id:"conv-14", day:12, time:"15:20-16:20", client:"Bradesco",
-    title:"O lado humano da transformacao digital: por que a tecnologia nao e o maior desafio?",
-    location:"Livraria Jaqueira",
+    title:"O lado humano da transformação digital: porque a tecnologia não é o maior desafio?",
+    location:"Livraria Jaqueira - Auditório",
     speakers:[
-      {name:"Noemi Rodrigues",role:"Technology Associate Director",                          company:"Accenture"},
-      {name:"Edilson Reis",   role:"CIO | Digital, Dados, IA, Inovacao e Customer Experience",company:"Bradesco Seguros",isClient:true}
+      {name:"Noemi Rodrigues Modernel",role:"Technology Associate Director",                          company:"Accenture"},
+      {name:"Edilson Reis",   role:"CIO | Digital, Dados, IA, Inovação e Customer Experience",company:"Bradesco Seguros",isClient:true}
     ]
   }
 ];
@@ -1504,7 +2470,7 @@ const convidaActivities = [
 convidaActivities.forEach(a => activityMap[a.id] = a);
 
 /* Com Clientes screen controller */
-let currentDayC = 11;
+let currentDayC = "all";
 
 function renderCardC(act){
   const show  = act.speakers.slice(0,3);
@@ -1527,7 +2493,7 @@ function renderCardC(act){
       <div class="card-meta">
         <div class="meta-row">
           <span class="ms ms-16">person</span>
-          <span>${esc(act.speakers[0]?.name||"")}</span>
+          <span class="meta-spk" title="${esc(spkTitle(act.speakers))}">${esc(spkLine(act.speakers))}</span>
         </div>
         <div class="meta-row">
           <span class="ms ms-16">location_on</span>
@@ -1535,58 +2501,69 @@ function renderCardC(act){
         </div>
       </div>
       <div class="card-tags">
-        <span class="tag tag-cat">${esc(act.client)}</span>
+        ${clientTagsHtml(act) || `<span class="tag tag-cat">${esc(act.client)}</span>`}
         <span class="tag tag-convida">Clientes que convidamos</span>
       </div>
     </div>`;
 }
 
 function renderDayC(day){
-  const list      = convidaActivities.filter(a=>a.day===day);
+  const cli       = filtroCliente.c;
+  const list      = dayList(convidaActivities,day,cli);
   const container = document.getElementById("cards-container-c");
   const label     = document.getElementById("count-label-c");
   if(!list.length){
     label.textContent="";
-    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Nao ha atividades com clientes<br>registradas para este dia.</p></div>`;
+    container.innerHTML=emptyHtml(cli, "Não há atividades com clientes<br>registradas para este dia.", "c");
     return;
   }
-  label.textContent=`${list.length} atividade${list.length>1?"s":""}`;
-  container.innerHTML=list.map(renderCardC).join("");
+  label.textContent=`${list.length} atividade${list.length>1?"s":""}${cli?" · "+cli:""}`;
+  container.innerHTML=cardsHtml(list,day,renderCardC);
 }
 
 function setDayC(day){
   currentDayC=day;
   document.querySelectorAll("#day-filter-c .day-chip").forEach(el=>{
-    el.classList.toggle("active",parseInt(el.dataset.day)===day);
+    el.classList.toggle("active",chipDay(el)===day);
   });
   renderDayC(day);
 }
 document.querySelectorAll("#day-filter-c .day-chip").forEach(el=>{
-  el.addEventListener("click",()=>setDayC(parseInt(el.dataset.day)));
+  el.addEventListener("click",()=>setDayC(chipDay(el)));
 });
 
-setDayS(11);
+setDayS("all");
 
 /* ================================================================
-   INNOVATION CENTER AUDITÓRIO — 11 atividades
-   Fonte: RecNPlay_Accenture_Innovation_Center_Auditorio.txt | 05/11/2026
+   INNOVATION CENTER AUDITÓRIO — 14 atividades (11/11: 5 · 12/11: 5 · 13/11: 4)
+   Fonte: RecNPlay_Accenture_Innovation_Center_Auditorio.txt | revisão 2 — 10/11/2026 (conferida com a agenda oficial)
    Local fixo: Accenture Innovation Center - Auditório
    Dia 14: sem programação publicada.
    ================================================================ */
 const icActivities = [
 
   /* ===== DIA 11 ===== */
+  { id:"ic-12", day:11, time:"09:00-13:00", shortOffBy:"Accenture",
+    title:"Qiskit Fall Fest: uma experiência imersiva em computação quântica",
+    format:"Experiência",
+    speakers:[
+      {name:"Yara Rodrigues",              role:"Innovation Research Analyst",                          company:"Accenture"},
+      {name:"Saulo Cadete Santos Machado", role:"Gerente Sênior de Inovação",                           company:"Accenture do Brasil"},
+      {name:"Gustavo Botelho",             role:"PhD em Ciência da Computação e IA/Análise de dados",   company:"Banco do Brasil",isClient:true},
+      {name:"Erico Teixeira",              role:"Researcher in Quantum Computing",                      company:"Venturus"}
+    ]
+  },
   { id:"ic-01", day:11, time:"14:00-15:00", shortOffBy:"Accenture",
-    title:"Ipiranga + IA: os bastidores de uma transformacao analitica em escala real",
+    title:"Ipiranga + IA: os bastidores de uma transformação analítica em escala real",
     format:"Roda de Conversa",
     speakers:[
-      {name:"Sergio Luiz Coutinho Ferreira",    role:"Gerente Senior",                              company:"Accenture"},
+      {name:"Sergio Luiz Coutinho Ferreira",    role:"Gerente Sênior",                              company:"Accenture"},
       {name:"Angela Kai",                        role:"Head de Dados, IA e Arquitetura Corporativa", company:"Ipiranga",isClient:true},
       {name:"Sergio Alexandre Naime Mantovani",  role:"Associate Director",                          company:"Accenture"}
     ]
   },
   { id:"ic-02", day:11, time:"15:20-16:35", shortOffBy:"Meira & Pompeia",
-    title:"Dados para marketing: anuncios melhores e uma base de clientes mais inteligente",
+    title:"Dados para marketing: anúncios melhores e uma base de clientes mais inteligente",
     format:"Debate",
     speakers:[
       {name:"Socorro Macedo",  role:"Cofundadora e diretora", company:"LeFil Company"},
@@ -1594,14 +2571,14 @@ const icActivities = [
     ]
   },
   { id:"ic-03", day:11, time:"17:00-17:45", shortOffBy:"Serpro",
-    title:"Conecta Gov.br e Conecta+: Da Interoperabilidade a Economia de Dados",
+    title:"Conecta Gov.br e Conecta+: Da Interoperabilidade à Economia de Dados",
     format:"Palestra",
     speakers:[
-      {name:"Arton Perez Peixoto", role:"", company:"Serpro"}
+      {name:"Arton Perez Peixoto", role:"", company:""}
     ]
   },
   { id:"ic-04", day:11, time:"18:00-19:00", shortOffBy:"Accenture",
-    title:"Accenture SAP Domains: Comunidade, Valor e a Reinvencao dos Projetos SAP",
+    title:"Accenture SAP Domains: Comunidade, Valor e a Reinvenção dos Projetos SAP",
     format:"Roda de Conversa",
     speakers:[
       {name:"Carla Warick", role:"Delivery Lead Assoc Director", company:"Accenture"},
@@ -1611,16 +2588,16 @@ const icActivities = [
 
   /* ===== DIA 12 ===== */
   { id:"ic-05", day:12, time:"10:00-11:15", shortOffBy:"Meira & Pompeia",
-    title:"China: onde conteudo, tecnologia e comercio se encontram",
+    title:"China: onde conteúdo, tecnologia e comércio se encontram",
     format:"Debate",
     speakers:[
-      {name:"Silvio Meira", role:"Fundador e Cientista Chefe",                   company:"TDS Company"},
-      {name:"Ale Souza",    role:"CMO e Empreendedora",                          company:"Ifa | Consultoria Estrategica"},
-      {name:"In Hsieh",     role:"Socio do IEST Group, cofundador da Chinnovation",company:"Brazil China Tech Network"}
+      {name:"Silvio Meira", role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School", company:""},
+      {name:"Ale Souza",    role:"CMO e Empreendedora",                          company:"Ifá | Consultoria Estratégica"},
+      {name:"In Hsieh",     role:"Sócio do IEST Group, cofundador da Chinnovation e da Brazil China Tech Network e parceiro do Alibaba Global Initiatives no Brasil",company:""}
     ]
   },
   { id:"ic-06", day:12, time:"11:20-12:35", shortOffBy:"Meira & Pompeia",
-    title:"Conteudos e criativos com IA: da ideia a pratica nas marcas",
+    title:"Conteúdos e criativos com IA: da ideia à prática nas marcas",
     format:"Debate",
     speakers:[
       {name:"Socorro Macedo",role:"Cofundadora e diretora",           company:"LeFil Company"},
@@ -1628,16 +2605,17 @@ const icActivities = [
     ]
   },
   { id:"ic-07", day:12, time:"14:00-15:15", shortOffBy:"Meira & Pompeia",
-    title:"Marketing do Futuro na era da IA Native: o que fariamos diferente se comecassemos hoje?",
+    title:"Marketing do Futuro na era da IA Native: o que faríamos diferente se começássemos hoje?",
     format:"Debate",
     speakers:[
-      {name:"Silvio Meira",    role:"Fundador e Cientista Chefe", company:"TDS Company"},
-      {name:"Rosario Pompeia", role:"Fundadora",                   company:"LeFil Company"},
-      {name:"Petria Chaves",   role:"Jornalista e apresentadora",  company:"CBN"}
+      {name:"Silvio Meira",    role:"Cientista Chefe da TDS Company e Professor Extraordinário da CESAR School", company:""},
+      {name:"Rosário Pompéia", role:"Fundadora",                   company:"LeFil Company"},
+      {name:"Petria Chaves",   role:"Jornalista e apresentadora",  company:"CBN"},
+      {name:"Lucia Bittar",    role:"Diretora MKT Samsung Galaxy experience", company:""}
     ]
   },
   { id:"ic-08", day:12, time:"15:40-16:40", shortOffBy:"Serpro",
-    title:"Como proteger o cidadao com o uso responsavel de dados? Antifraude, IA e privacidade no Governo Digital",
+    title:"Como proteger o cidadão com o uso responsável de dados? Antifraude, IA e privacidade no Governo Digital",
     format:"Roda de Conversa",
     speakers:[
       {name:"Franklin Jeferson dos Santos", role:"Gerente de Departamento", company:"Serpro"},
@@ -1646,31 +2624,48 @@ const icActivities = [
     ]
   },
   { id:"ic-09", day:12, time:"17:00-18:15", shortOffBy:"Meira & Pompeia",
-    title:"Comunidade nao e nicho. E negocio",
+    title:"Comunidade não é nicho. É negócio",
     format:"Debate",
     speakers:[
       {name:"Socorro Macedo",      role:"Cofundadora e diretora",                             company:"LeFil Company"},
-      {name:"Renata Carvalho",     role:"Gerente de Marketing, Trade e Inteligencia de Mercado",company:"Grupo Raymundo da Fonte"},
+      {name:"Renata Carvalho",     role:"Gerente de Marketing, Trade e Inteligência de Mercado",company:"Grupo Raymundo da Fonte"},
       {name:"Leonardo Vasconcelos",role:"Diretor Comercial",                                   company:"Grupo Iquine"}
     ]
   },
 
   /* ===== DIA 13 ===== */
+  { id:"ic-13", day:13, time:"12:40-13:25", shortOffBy:"Sebrae",
+    title:"IA para negócios: como evoluir suas vendas e tomar melhores decisões estratégicas",
+    format:"Palestra",
+    speakers:[
+      {name:"Katherine Sallum", role:"", company:""}
+    ]
+  },
   { id:"ic-10", day:13, time:"14:00-15:00", shortOffBy:"Accenture",
-    title:"IA no coracao do dinheiro: como a IA esta redesenhando a industria financeira",
+    title:"IA no coração do dinheiro: como a IA está redesenhando a indústria financeira",
     format:"Debate",
     speakers:[
       {name:"Noemi Rodrigues Modernel", role:"Technology Associate Director",                        company:"Accenture"},
-      {name:"Mauricio Barbosa",          role:"Lider de Servicos Financeiros para a America Latina",   company:"Accenture"},
+      {name:"Mauricio Barbosa",          role:"Lead Managing Director",company:"Accenture"},
       {name:"Daniel de Amaral",          role:"Managing Director",                                     company:"Accenture"}
     ]
   },
   { id:"ic-11", day:13, time:"16:40-17:40", shortOffBy:"MV",
-    title:"E se a IA soubesse que voce esta doente antes de voce?",
+    title:"E se a IA soubesse que você está doente antes de você?",
     format:"Debate",
     speakers:[
       {name:"Emerson Zarour", role:"Diretor Global Health", company:"MV"},
-      {name:"Kleber Araujo",  role:"CMIO",                  company:"MV"}
+      {name:"Kléber Araújo",  role:"CMIO",                  company:"MV"}
+    ]
+  },
+  { id:"ic-14", day:13, time:"18:00-19:00", shortOffBy:"Porto Digital",
+    title:"As canetas de GLP-1 pagam a conta: prevenção será a nova onda de negócios em saúde?",
+    format:"Debate",
+    speakers:[
+      {name:"Fernando Sales",  role:"Professor",                         company:"UFPE"},
+      {name:"Miguel Porto",    role:"Founder da PetTop",                 company:""},
+      {name:"Erica Batista",   role:"Diretora Santa Joana Recife",       company:"Hospital Santa Joana Recife"},
+      {name:"José Iran Costa Jr", role:"",                               company:""}
     ]
   }
   /* Dia 14 — sem atividades publicadas */
@@ -1680,7 +2675,7 @@ const icActivities = [
 icActivities.forEach(a => activityMap[a.id] = a);
 
 /* Innovation Center screen controller */
-let currentDayI = 11;
+let currentDayI = "all";
 
 function renderCardI(act){
   const show  = act.speakers.slice(0,3);
@@ -1703,85 +2698,109 @@ function renderCardI(act){
       <div class="card-meta">
         <div class="meta-row">
           <span class="ms ms-16">person</span>
-          <span>${esc(act.speakers[0]?.name||"")}</span>
+          <span class="meta-spk" title="${esc(spkTitle(act.speakers))}">${esc(spkLine(act.speakers))}</span>
         </div>
         <div class="meta-row">
           <span class="ms ms-16">location_on</span>
-          <span>Accenture IC — Auditorio</span>
+          <span>Accenture IC — Auditório</span>
         </div>
       </div>
       <div class="card-tags">
         <span class="tag tag-cat">${esc(act.shortOffBy)}</span>
-        <span class="tag tag-ic">Auditorio IC</span>
+        ${clientTagsHtml(act)}
+        <span class="tag tag-ic">Auditório IC</span>
       </div>
     </div>`;
 }
 
 function renderDayI(day){
-  const list      = icActivities.filter(a=>a.day===day);
+  const list      = dayList(icActivities,day);
   const container = document.getElementById("cards-container-i");
   const label     = document.getElementById("count-label-i");
   if(!list.length){
     label.textContent="";
-    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Nao ha programacao publicada<br>no Auditorio IC para este dia.</p></div>`;
+    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Não há programação publicada<br>no Auditório IC para este dia.</p></div>`;
     return;
   }
   label.textContent=`${list.length} atividade${list.length>1?"s":""}`;
-  container.innerHTML=list.map(renderCardI).join("");
+  container.innerHTML=cardsHtml(list,day,renderCardI);
 }
 
 function setDayI(day){
   currentDayI=day;
   document.querySelectorAll("#day-filter-i .day-chip").forEach(el=>{
-    el.classList.toggle("active",parseInt(el.dataset.day)===day);
+    el.classList.toggle("active",chipDay(el)===day);
   });
   renderDayI(day);
 }
 document.querySelectorAll("#day-filter-i .day-chip").forEach(el=>{
-  el.addEventListener("click",()=>setDayI(parseInt(el.dataset.day)));
+  el.addEventListener("click",()=>setDayI(chipDay(el)));
 });
 
-setDayC(11);
-setDayI(11);
+setDayC("all");
+setDayI("all");
 
 /* ───────────────────────────────────────────────
-   FOMOS CONVIDADOS — Accenture convidada por outros
+   FOMOS CONVIDADOS — Accenture convidada por outros (5 atividades: 11/11 ×4 · 12/11 ×1)
+   Fonte: RecNPlay_2026_Convidada_Accenture.txt | revisão 2 — 10/11/2026
    ─────────────────────────────────────────────── */
 const convidadaActivities = [
   { id:"fomos-01", day:11, time:"10:20-11:20",
-    title:"Mulher macho, sim senhor? Precisamos masculinizar a forca feminina para ocupar as areas de STEM?",
-    location:"Ti.Saude",
+    title:"“Mulher macho, sim senhor?” Precisamos masculinizar a força feminina para ocupar as áreas de STEM?",
+    location:"Ti.Saúde",
     format:"Roda de Conversa",
     speakers:[
-      {name:"Thayana Pereira de Almeida", role:"Product e Service Design",        company:"Accenture"},
-      {name:"Marianna Maldi Veras",       role:"Analista de Infraestrutura",       company:"Globo"},
-      {name:"Barbara Maia",               role:"Team lead",                        company:"Trillia"}
+      {name:"Marianna Maldi Veras",       role:"Analista de Infraestrutura", company:"Globo"},
+      {name:"Thayana Pereira de Almeida", role:"Product e Service Design",   company:"Accenture"},
+      {name:"Bárbara Maia",               role:"Team lead",                  company:"Trillia"}
+    ]
+  },
+  { id:"fomos-04", day:11, time:"14:00-15:00",
+    title:"O estudante no centro da IA: o que estamos sentindo, fazendo e questionando?",
+    location:"Arena de Educação CESAR - Palco Externo",
+    format:"Debate",
+    speakers:[
+      {name:"Rafael Batista Duarte",           role:"Professor",                  company:"CESAR School"},
+      {name:"Alice Maria Sena Pereira",        role:"Tech Architecture Associate",company:"Accenture"},
+      {name:"Lucas Cantarelli Lustosa",        role:"",                           company:""},
+      {name:"Robson Sandro Andrade Cunha Filho",role:"",                          company:""}
+    ]
+  },
+  { id:"fomos-05", day:11, time:"14:00-15:00",
+    title:"AI-Native Squads: Como montar e operar squads AI-Native?",
+    location:"Cesar School - Bloco A - Sala 204",
+    format:"Debate",
+    speakers:[
+      {name:"Átila Bittencourt", role:"Gerente Executivo de Ventures",      company:"CESAR"},
+      {name:"Tiago Barros",      role:"Principal Technical Software Manager",company:"CESAR"},
+      {name:"Geraldo Filho",     role:"Managing Director",                  company:"Accenture"},
+      {name:"Mauro Silva",       role:"Head de Produtos",                   company:"Tempest Security Intelligence"}
     ]
   },
   { id:"fomos-02", day:11, time:"18:00-19:00",
-    title:"Da primeira oportunidade a lideranca: mulheres que abriram caminho",
+    title:"Da primeira oportunidade à liderança: mulheres que abriram caminho",
     location:"Livraria Jaqueira - Galeria",
     format:"Roda de Conversa",
     speakers:[
-      {name:"Melissa Paula Namizaki Dezan",    role:"Diretora",                              company:"Accenture Brasil"},
-      {name:"Virginia de Melo Cunha Heimann",  role:"Diretora",                              company:"NTT Data Brasil"},
-      {name:"Maria Clara Barroso",             role:"Diretora de Gente e Gestao no CITi",   company:"CITi"}
+      {name:"Virgínia Heimann",             role:"Diretora na NTT Data Brasil",         company:"NTT Data Brasil"},
+      {name:"Melissa Paula Namizaki Dezan", role:"Diretora na Accenture Brasil",        company:"Accenture Brasil"},
+      {name:"Maria Clara Barroso",          role:"Diretora de Gente e Gestão no CITi",  company:"CITi"}
     ]
   },
   { id:"fomos-03", day:12, time:"14:00-15:00",
-    title:"Do \"funcionou!\" ao \"uau!\": o que transforma um projeto em uma experiencia de destaque",
+    title:"Do “funcionou!” ao “uau!”: o que transforma um projeto em uma experiência de destaque",
     location:"Sede Porto Digital - Lab Verde",
     format:"Palestra",
     speakers:[
       {name:"Alice Maria Sena Pereira", role:"Tech Architecture Associate", company:"Accenture"}
     ]
   }
-  /* Dias 13 e 14 — sem atividades publicadas */
+  /* Dias 13 e 14 — sem atividades com participante Accenture */
 ];
 
 convidadaActivities.forEach(a => activityMap[a.id] = a);
 
-let currentDayFomos = 11;
+let currentDayFomos = "all";
 
 function renderCardFomos(act){
   const show  = act.speakers.slice(0,3);
@@ -1804,7 +2823,7 @@ function renderCardFomos(act){
       <div class="card-meta">
         <div class="meta-row">
           <span class="ms ms-16">person</span>
-          <span>${esc(act.speakers[0]?.name||"")}</span>
+          <span class="meta-spk" title="${esc(spkTitle(act.speakers))}">${esc(spkLine(act.speakers))}</span>
         </div>
         <div class="meta-row">
           <span class="ms ms-16">location_on</span>
@@ -1812,6 +2831,7 @@ function renderCardFomos(act){
         </div>
       </div>
       <div class="card-tags">
+        ${clientTagsHtml(act)}
         <span class="tag tag-fomos">Fomos Convidados</span>
         <span class="tag tag-cat">${esc(act.format)}</span>
       </div>
@@ -1819,32 +2839,183 @@ function renderCardFomos(act){
 }
 
 function renderDayFomos(day){
-  const list      = convidadaActivities.filter(a=>a.day===day);
+  const list      = dayList(convidadaActivities,day);
   const container = document.getElementById("cards-container-fomos");
   const label     = document.getElementById("count-label-fomos");
   if(!list.length){
     label.textContent="";
-    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Nao ha atividades com<br>pessoas da Accenture convidadas<br>para este dia.</p></div>`;
+    container.innerHTML=`<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Não há atividades com<br>pessoas da Accenture convidadas<br>para este dia.</p></div>`;
     return;
   }
   label.textContent=`${list.length} atividade${list.length>1?"s":""}`;
-  container.innerHTML=list.map(renderCardFomos).join("");
+  container.innerHTML=cardsHtml(list,day,renderCardFomos);
 }
 
 function setDayFomos(day){
   currentDayFomos=day;
   document.querySelectorAll("#day-filter-fomos .day-chip").forEach(el=>{
-    el.classList.toggle("active",parseInt(el.dataset.day)===day);
+    el.classList.toggle("active",chipDay(el)===day);
   });
   renderDayFomos(day);
 }
 document.querySelectorAll("#day-filter-fomos .day-chip").forEach(el=>{
-  el.addEventListener("click",()=>setDayFomos(parseInt(el.dataset.day)));
+  el.addEventListener("click",()=>setDayFomos(chipDay(el)));
 });
 
-setDayFomos(11);
+setDayFomos("all");
 
 
+
+/* ================================================================
+   FILTRO POR CLIENTE (dropdown) — abas "Clientes pelo Fest" e "Clientes que convidamos"
+   Combina com o filtro de data. As opções vêm da própria base de cada aba
+   (cliente + nº de atividades), em ordem alfabética.
+   ================================================================ */
+function emptyHtml(cli, msgPadrao, key){
+  if(!cli) return `<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>${msgPadrao}</p></div>`;
+  return `<div class="empty-state"><span class="ms">event_busy</span><strong>Nenhuma atividade</strong><p>Não há atividades de ${esc(cli)}<br>para este dia.</p><button type="button" class="empty-action" onclick="limparFiltroCliente('${key}')">Ver todos os dias</button></div>`;
+}
+const CLIENT_TABS = {
+  cf: { src:()=>activities,         render:()=>renderDay(currentDay),  chipsAll:"#day-filter .day-chip[data-day=\"all\"]",   setDay:()=>setDay("all") },
+  c:  { src:()=>convidaActivities,  render:()=>renderDayC(currentDayC), chipsAll:"#day-filter-c .day-chip[data-day=\"all\"]", setDay:()=>setDayC("all") }
+};
+function limparFiltroCliente(key){ aplicarFiltroCliente(key, "", true); }
+function aplicarFiltroCliente(key, valor, voltarTodos){
+  filtroCliente[key] = valor;
+  const sel = document.getElementById("client-select-"+key), clr = document.getElementById("client-clear-"+key);
+  sel.value = valor; sel.classList.toggle("is-filtered", !!valor); clr.hidden = !valor;
+  if(voltarTodos) CLIENT_TABS[key].setDay(); else CLIENT_TABS[key].render();
+}
+(function(){
+  Object.keys(CLIENT_TABS).forEach(key=>{
+    const sel = document.getElementById("client-select-"+key), clr = document.getElementById("client-clear-"+key);
+    const cont = {};
+    CLIENT_TABS[key].src().forEach(a=>actClients(a).forEach(c=>{ cont[c]=(cont[c]||0)+1; }));
+    const nomes = Object.keys(cont).sort((a,b)=>a.localeCompare(b,"pt-BR"));
+    sel.innerHTML = `<option value="">Todos os clientes (${nomes.length})</option>` +
+      nomes.map(n=>`<option value="${esc(n)}">${esc(n)} · ${cont[n]}</option>`).join("");
+    sel.addEventListener("change", ()=>aplicarFiltroCliente(key, sel.value, false));
+    clr.addEventListener("click",  ()=>aplicarFiltroCliente(key, "", false));
+  });
+})();
+
+/* ================================================================
+   PANORAMA — todos os indicadores são calculados a partir dos dados
+   (precisa ficar depois de todas as bases: nossas, convida, IC, fomos, clientes pelo fest)
+   ================================================================ */
+(function(){
+  const TODAS = [submissoesActivities, convidaActivities, icActivities, convidadaActivities, activities];
+
+  /* Vozes Accenture: pessoas únicas (empresa Accenture). A mesma pessoa pode aparecer com
+     grafias diferentes entre as bases; "primeiro + último nome" une variações como
+     "Marcos de Freitas" / "Marcos Freitas", e o mapa abaixo cobre o que isso não alcança. */
+  const MESMA_PESSOA = { "noemi rodrigues":"noemi modernel" };
+  const chavePessoa = nome => {
+    const t = normCo(nome).split(/\s+/).filter(Boolean);
+    const k = t.length>1 ? t[0]+" "+t[t.length-1] : (t[0]||"");
+    return MESMA_PESSOA[k] || k;
+  };
+  const vozes = new Set();
+  TODAS.forEach(l=>l.forEach(a=>a.speakers.forEach(s=>{
+    if(normCo(s.company).includes("accenture")) vozes.add(chavePessoa(s.name));
+  })));
+
+  /* Clientes: no nosso palco = clientes convidados nas atividades da Accenture;
+     no festival = participantes clientes em qualquer atividade + clientes que oferecem atividade. */
+  const ordena = set => [...set].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  const clientesPalco = new Set();
+  submissoesActivities.forEach(a=>clientNames(a).forEach(c=>clientesPalco.add(c)));
+  const clientesFest = new Set();
+  TODAS.forEach(l=>l.forEach(a=>{
+    clientNames(a).forEach(c=>clientesFest.add(c));
+    if(a.isOfferedBy) (a.clients||[a.client]).forEach(c=>clientesFest.add(c));
+  }));
+
+  const chips = (id, lista) => {
+    const box = document.getElementById(id);
+    box.textContent = "";
+    ordena(lista).forEach(n=>{
+      const s = document.createElement("span");
+      s.className = "kpi-client-chip"; s.textContent = n; box.appendChild(s);
+    });
+  };
+  document.getElementById("kpi-atividades").textContent     = submissoesActivities.length;
+  document.getElementById("kpi-vozes").textContent          = vozes.size;
+  document.getElementById("kpi-clientes-palco").textContent = clientesPalco.size;
+  document.getElementById("kpi-clientes-fest").textContent  = clientesFest.size;
+  chips("kpi-chips-palco", clientesPalco);
+  chips("kpi-chips-fest",  clientesFest);
+})();
+
+/* ================================================================
+   PANORAMA — Ranking de clientes + Onde estamos (calculados dos dados)
+   ================================================================ */
+function abrirCliente(cliente){
+  const noCF  = activities.some(a=>actClients(a).includes(cliente));
+  const key   = noCF ? "cf" : "c";
+  document.querySelector(`#tab-bar .tab[data-screen="${noCF ? "clientes" : "convida"}"]`).click();
+  aplicarFiltroCliente(key, cliente, true);
+  // leva ao título da aba, abaixo da barra fixa; sem animação se o usuário prefere menos movimento
+  const alvo = document.querySelector(`#screen-${noCF ? "clientes" : "convida"} .screen-title`);
+  const barra = document.querySelector(".nav-sticky").offsetHeight;
+  const topo = alvo.getBoundingClientRect().top + window.scrollY - barra - 12;
+  window.scrollTo({ top: Math.max(0, topo), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+(function(){
+  /* ---- Ranking: cada atividade conta uma vez (várias aparecem em mais de uma aba) ---- */
+  const vistas = new Set(), cont = {};
+  const chave  = a => normCo(a.title).replace(/[^a-z0-9]+/g," ").trim()+"|"+a.day;
+  const somar  = (a, tipo) => {
+    const k = chave(a); if(vistas.has(k)) return; vistas.add(k);
+    actClients(a).forEach(c=>{ if(!cont[c]) cont[c] = {nosso:0, outros:0}; cont[c][tipo]++; });
+  };
+  submissoesActivities.forEach(a=>somar(a,"nosso"));
+  [convidaActivities, icActivities, convidadaActivities, activities].forEach(l=>l.forEach(a=>somar(a,"outros")));
+  const rank = Object.keys(cont)
+    .map(c=>({c, nosso:cont[c].nosso, outros:cont[c].outros, total:cont[c].nosso+cont[c].outros}))
+    .sort((a,b)=>b.total-a.total || a.c.localeCompare(b.c,"pt-BR"));
+  const max = rank.length ? rank[0].total : 1;
+  const TOP = 8;
+  const lista = document.getElementById("rank-list"), toggle = document.getElementById("rank-toggle");
+  let aberto = false;
+  const linkavel = c => activities.some(a=>actClients(a).includes(c)) || convidaActivities.some(a=>actClients(a).includes(c));
+  function pinta(){
+    const itens = aberto ? rank : rank.slice(0,TOP);
+    lista.innerHTML = itens.map(r=>{
+      const partes = [r.outros ? `${r.outros} em outros palcos` : "", r.nosso ? `${r.nosso} no nosso palco` : ""].filter(Boolean).join(" e ");
+      const rotulo = `${r.c}: ${r.total} atividade${r.total>1?"s":""} (${partes})`;
+      const barra  = `<span class="rank-bar" aria-hidden="true"><span class="rank-seg--out" style="width:${r.outros/max*100}%"></span><span class="rank-seg--our" style="width:${r.nosso/max*100}%"></span></span>`;
+      const miolo  = `<span class="rank-name">${esc(r.c)}</span>${barra}<span class="rank-num">${r.total}</span>`;
+      return linkavel(r.c)
+        ? `<button type="button" class="rank-row" data-cliente="${esc(r.c)}" aria-label="${esc(rotulo)}. Abrir programação" title="${esc(rotulo)}">${miolo}</button>`
+        : `<div class="rank-row rank-row--static" aria-label="${esc(rotulo)}">${miolo}</div>`;
+    }).join("");
+    toggle.hidden = rank.length <= TOP;
+    toggle.textContent = aberto ? "Ver menos" : `Ver todos os ${rank.length} clientes`;
+    toggle.setAttribute("aria-expanded", String(aberto));
+  }
+  lista.addEventListener("click", e=>{ const b = e.target.closest("[data-cliente]"); if(b) abrirCliente(b.dataset.cliente); });
+  toggle.addEventListener("click", ()=>{ aberto = !aberto; pinta(); });
+  pinta();
+
+  /* ---- Onde estamos: locais das NOSSAS atividades, agrupados por local e espaço ---- */
+  const locais = {};
+  submissoesActivities.forEach(a=>{
+    const p = (a.location||"").split(" - ");
+    const venue = /^Accenture Innovation Center/.test(a.location||"") ? "Accenture Innovation Center" : p[0].trim();
+    const espaco = p.slice(1).join(" - ");
+    if(!locais[venue]) locais[venue] = {n:0, esp:{}};
+    locais[venue].n++;
+    if(espaco) locais[venue].esp[espaco] = (locais[venue].esp[espaco]||0)+1;
+  });
+  const vs  = Object.keys(locais).sort((a,b)=>locais[b].n-locais[a].n || a.localeCompare(b,"pt-BR"));
+  const maxV = vs.length ? locais[vs[0]].n : 1;
+  document.getElementById("venue-list").innerHTML = vs.map(v=>{
+    const esp = Object.keys(locais[v].esp).sort((a,b)=>locais[v].esp[b]-locais[v].esp[a] || a.localeCompare(b,"pt-BR"));
+    const linha = esp.length ? esp.map(e=>`${esc(e)} (${locais[v].esp[e]})`).join(" · ") : "";
+    return `<div class="venue-row"><div class="venue-top"><span class="venue-name">${esc(v)}</span><span class="venue-num">${locais[v].n} atividade${locais[v].n>1?"s":""}</span></div><div class="venue-bar" aria-hidden="true"><i style="width:${locais[v].n/maxV*100}%"></i></div>${linha ? `<div class="venue-spaces">${linha}</div>` : ""}</div>`;
+  }).join("");
+})();
 </script>
 </body>
 </html>
